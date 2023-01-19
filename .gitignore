@@ -1,0 +1,24 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**
+!**/src/test/**
+
+tmp/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+
+### Env File ##
+.env*
+
+## Go 
+src/
+deploy*.sh
+
+## Bin
+payso-*
+
