@@ -1,26 +1,26 @@
 package service
 
 import (
-	"payso/go_template/handler"
-	"payso/go_template/model"
-	"payso/go_template/repository"
+	"payso/payment-service/handler"
+	"payso/payment-service/model"
+	"payso/payment-service/repository"
 
 	log "github.com/sirupsen/logrus"
 )
 
-type SampleService interface {
+type PaymentService interface {
 	SampleServiceFunction(someData model.SampleModel) (string, error)
 }
 
-type sampleService struct {
-	someHandler handler.SampleHandler
+type paymentService struct {
+	someHandler handler.GWSHandler
 }
 
-func NewSampleService(someHandler handler.SampleHandler) sampleService {
-	return sampleService{someHandler}
+func NewPaymentService(someHandler handler.GWSHandler) paymentService {
+	return paymentService{someHandler}
 }
 
-func (obj sampleService) SampleServiceFunction(someData model.SampleModel) (string, error) {
+func (obj paymentService) SampleServiceFunction(someData model.SampleModel) (string, error) {
 	/** Define log component **/
 	log := log.WithFields(log.Fields{
 		"component": "SampleService",

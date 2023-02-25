@@ -4,19 +4,19 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"payso/go_template/controller"
-	"payso/go_template/handler"
-	"payso/go_template/service"
+	"payso/payment-service/controller"
+	"payso/payment-service/handler"
+	"payso/payment-service/service"
 
 	"strings"
 	"time"
 
+	nested "github.com/antonfisher/nested-logrus-formatter"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	easy "github.com/t-tomalak/logrus-easy-formatter"
 )
 
 var logFile = "/tmp/some-log-go.log"
@@ -49,9 +49,11 @@ func init() {
 		fmt.Printf("error opening file: %v", err)
 	}
 
-	log.SetFormatter(&easy.Formatter{
-		TimestampFormat: "2006-01-02 15:04:05",
-		LogFormat:       "[%lvl%]: %time% - %msg%\n",
+	log.SetFormatter(&nested.Formatter{
+		TimestampFormat: "2006-01-02 15:04:05.000",
+		HideKeys:        true,
+		NoColors:        false,
+		FieldsOrder:     []string{"component", "function"},
 	})
 
 	log.SetOutput(mw)
@@ -80,10 +82,12 @@ func main() {
 		AllowOrigins: "*",
 	}))
 
-	controller := controller.NewSampleController(service.NewSampleService(handler.NewSampleHandler()))
+	controller := controller.NewPaymentController(service.NewPaymentService(handler.NewGWSHandler()))
+
+	app.Get("/api/something", controller.SampleControllerFunction)
 
 	app.Get("/api/ping", controller.Ping)
-	app.Get("/api/something", controller.SampleControllerFunction)
+	app.Get("/api/payment", controller.Payment)
 
 	app.Listen(":" + viper.GetString("SERVER_PORT"))
 

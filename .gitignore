@@ -17,8 +17,7 @@ tmp/
 
 ## Go 
 src/
-deploy*.sh
 
 ## Bin
-payso-*
+payment-service*
 

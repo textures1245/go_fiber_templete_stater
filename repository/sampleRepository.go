@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"payso/go_template/model"
+	"payso/payment-service/model"
 
 	"github.com/blockloop/scan"
 	log "github.com/sirupsen/logrus"
