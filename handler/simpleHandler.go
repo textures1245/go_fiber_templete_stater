@@ -30,7 +30,7 @@ func (obj simpleHandler) SampleFunction(data string) (model.SampleModel, error) 
 		"funciton":  functionName,
 	})
 
-	log.Info("data : %v", data)
+	log.Infof("data : %v", data)
 	/** Write Some Code that call other Services **/
 	return model.SampleModel{}, nil
 }

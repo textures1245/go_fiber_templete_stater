@@ -24,15 +24,22 @@ func SetupRoutes(app *fiber.App) {
 
 	controller := controller.NewSampleController(service.NewSampleService(handler.NewSimpleHandler()))
 
-	api := app.Group("/api", func(c *fiber.Ctx) error {
+	api := app.Group("/", func(c *fiber.Ctx) error {
 		if !strings.Contains(c.Request().URI().String(), "/ping") {
-			log.Info(c.Request().URI().String())
+			log.Infof("all : %v", c.Request().URI().String())
 		}
 
 		return c.Next()
 	})
 
-	api.Get("/something", controller.SampleControllerFunction)
-	api.Get("/ping", controller.Ping)
+	api.Get("/api/something", controller.SampleControllerFunction)
+	api.Get("/api/ping", controller.Ping)
+
+	callback := app.Group("/callback", func(c *fiber.Ctx) error {
+		log.Infof("callback : %v", c.Request().URI().String())
+		return c.Next()
+	})
+
+	callback.Get("", controller.SampleControllerFunction)
 
 }
