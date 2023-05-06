@@ -9,6 +9,7 @@ import (
 
 	nested "github.com/antonfisher/nested-logrus-formatter"
 	rotatelogs "github.com/lestrrat/go-file-rotatelogs"
+	logrus_logstash "github.com/sima-land/logrus-logstash-hook"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -64,5 +65,13 @@ func Init() {
 		log.SetLevel(log.ErrorLevel)
 	default:
 		log.SetLevel(log.ErrorLevel)
+	}
+
+	hook, err := logrus_logstash.NewHook("tcp", viper.GetString("LOGSTASH"), "simple-noti")
+	if err != nil {
+		log.Error(err)
+	} else {
+		log.Info("-= Add Log Stash =-")
+		log.AddHook(hook)
 	}
 }

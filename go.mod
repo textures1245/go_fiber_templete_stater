@@ -8,6 +8,7 @@ require (
 	github.com/denisenkom/go-mssqldb v0.12.3
 	github.com/gofiber/fiber/v2 v2.44.0
 	github.com/lestrrat/go-file-rotatelogs v0.0.0-20180223000712-d3151e2a480f
+	github.com/sima-land/logrus-logstash-hook v0.0.0-20171113125854-e75938162af1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/viper v1.15.0
 )
