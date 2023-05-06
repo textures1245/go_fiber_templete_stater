@@ -7,8 +7,6 @@ type SampleModel struct {
 }
 
 var SQL_simple_add = `INSERT INTO some_table (some_column_1 ,some_column_2) 
-	VALUES(@p1, @p2);
-`
+	VALUES(@p1, @p2);`
 
-var SQL_simple_get_date = `select ID, some_column_1 as Column1 ,some_column_2 as Column2 from some_table where id = @id ;
-`
+var SQL_simple_get_date = `select GETDATE();`

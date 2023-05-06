@@ -5,7 +5,7 @@
 ```bash
 delete go.mod
 delete go.some
-go mod init payso/{module_name}
+go mod init payso-{module_name}
 ```
 
 ## Prepare ENV
@@ -13,17 +13,17 @@ go mod init payso/{module_name}
 ### Production
 
 ```bash
-$export $(cat .env | xargs)
+export $(cat .env | xargs)
 ```
 
 ### Staging
 
 ```bash
-$export $(cat .env_stg | xargs)
+export $(cat .env_stg | xargs)
 ```
 
 ### Run
 
 ```bash
-$go run .
+go run .
 ```

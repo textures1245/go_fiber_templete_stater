@@ -3,7 +3,7 @@ echo "-= Staging =-"
 export AWS_PROFILE=payso
 WORK_DIR=.
 DEST_DIR=s3://s3-payso-rohan/
-EXEC_FILE=payment-service
+EXEC_FILE=payso-simple-noti
 cd $WORK_DIR
 echo "-= Build =-"
 env GOOS=linux GOARCH=amd64 go build -o $WORK_DIR/$EXEC_FILE

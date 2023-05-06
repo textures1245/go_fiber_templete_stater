@@ -4,9 +4,11 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"payso-simple-noti/util"
 
 	_ "github.com/denisenkom/go-mssqldb"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 // Replace with your own connection parameters
@@ -18,6 +20,12 @@ var database = os.Getenv("DB_INST")
 var Db *sql.DB
 
 func init() {
+	util.Init()
+	server = viper.GetString("DB_SERVER")
+	port = 1433
+	user = viper.GetString("DB_USER")
+	password = viper.GetString("DB_PASS")
+	database = viper.GetString("DB_INST")
 	// Create connection string
 	var err error
 

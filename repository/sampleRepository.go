@@ -3,7 +3,9 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"payso/payment-service/model"
+	"payso-simple-noti/model"
+	"runtime"
+	"strings"
 
 	"github.com/blockloop/scan"
 	log "github.com/sirupsen/logrus"
@@ -11,10 +13,16 @@ import (
 
 func GetSomeData(id string) (model.SampleModel, error) {
 	/** Define log component **/
+
+	_, file, _, _ := runtime.Caller(0)
+	pc, _, _, _ := runtime.Caller(0)
+	functionName := strings.Split(runtime.FuncForPC(pc).Name(), ".")[len(strings.Split(runtime.FuncForPC(pc).Name(), "."))-1]
+
 	log := log.WithFields(log.Fields{
-		"component": "SampleRepository",
-		"funciton":  "GetSomeData",
+		"component": strings.Split(file, "/")[len(strings.Split(file, "/"))-1],
+		"funciton":  functionName,
 	})
+
 	log.Debugf("input ==>%s ", id)
 
 	db := GetDb()
@@ -55,9 +63,13 @@ func GetSomeData(id string) (model.SampleModel, error) {
 
 func AddSomeData(someData model.SampleModel) (string, error) {
 	/** Define log component **/
+	_, file, _, _ := runtime.Caller(0)
+	pc, _, _, _ := runtime.Caller(0)
+	functionName := strings.Split(runtime.FuncForPC(pc).Name(), ".")[len(strings.Split(runtime.FuncForPC(pc).Name(), "."))-1]
+
 	log := log.WithFields(log.Fields{
-		"component": "SampleRepository",
-		"funciton":  "AddSomeData",
+		"component": strings.Split(file, "/")[len(strings.Split(file, "/"))-1],
+		"funciton":  functionName,
 	})
 	log.Debugf("input : %v", someData)
 	db := GetDb()
