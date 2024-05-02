@@ -1,21 +1,24 @@
 package repository
 
 import (
-	"database/sql"
+	"github.com/jmoiron/sqlx"
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/textures1245/go-template/internal/user"
 	"github.com/textures1245/go-template/internal/user/dtos"
 	"github.com/textures1245/go-template/internal/user/entities"
+	"github.com/textures1245/go-template/pkg/datasource"
 )
 
 type userRepo struct {
-	db *sql.DB
+	db   *sqlx.DB
+	conn datasource.ConnTx
 }
 
-func NewUserRepository(db *sql.DB) user.UserRepository {
+func NewUserRepository(db *sqlx.DB) user.UserRepository {
 	return &userRepo{
-		db: db,
+		db:   db,
+		conn: db,
 	}
 }
 

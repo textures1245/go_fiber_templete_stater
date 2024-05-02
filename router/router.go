@@ -12,7 +12,8 @@ import (
 	_userRepo "github.com/textures1245/go-template/internal/user/repository"
 	_userUsecase "github.com/textures1245/go-template/internal/user/usecase"
 
-	"github.com/textures1245/go-template/repository"
+	"github.com/textures1245/go-template/config"
+	"github.com/textures1245/go-template/pkg/datasource"
 
 	"github.com/gofiber/fiber/v2"
 	log "github.com/sirupsen/logrus"
@@ -32,7 +33,12 @@ func SetupRoutes(app *fiber.App) {
 	controller := controller.NewSampleController(service.NewSampleService(handler.NewSimpleHandler()))
 
 	// set user conn
-	userRepo := _userRepo.NewUserRepository(repository.GetDb())
+	db, err := datasource.NewDB(config.LoadDBconfig())
+	if err != nil {
+		log.Errorf("Error : %v", err)
+	}
+
+	userRepo := _userRepo.NewUserRepository(db)
 	userService := _userUsecase.NewUserUsecase(userRepo)
 	userConn := _userConn.NewUserController(userService)
 
