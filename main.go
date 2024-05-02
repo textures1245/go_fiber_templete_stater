@@ -7,7 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 
-	"payso-simple-noti/router"
+	"github.com/textures1245/go-template/router"
 )
 
 func main() {

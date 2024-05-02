@@ -1,9 +1,10 @@
 package handler
 
 import (
-	"payso-simple-noti/model"
 	"runtime"
 	"strings"
+
+	"github.com/textures1245/go-template/model"
 
 	log "github.com/sirupsen/logrus"
 )

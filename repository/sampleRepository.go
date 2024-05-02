@@ -3,9 +3,10 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"payso-simple-noti/model"
 	"runtime"
 	"strings"
+
+	"github.com/textures1245/go-template/model"
 
 	"github.com/blockloop/scan"
 	log "github.com/sirupsen/logrus"

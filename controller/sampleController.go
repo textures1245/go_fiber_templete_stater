@@ -2,10 +2,11 @@ package controller
 
 import (
 	"net/http"
-	"payso-simple-noti/model"
-	"payso-simple-noti/service"
 	"runtime"
 	"strings"
+
+	"github.com/textures1245/go-template/model"
+	"github.com/textures1245/go-template/service"
 
 	"github.com/gofiber/fiber/v2"
 	log "github.com/sirupsen/logrus"

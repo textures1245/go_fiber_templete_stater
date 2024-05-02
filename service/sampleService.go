@@ -1,11 +1,12 @@
 package service
 
 import (
-	"payso-simple-noti/handler"
-	"payso-simple-noti/model"
-	"payso-simple-noti/repository"
 	"runtime"
 	"strings"
+
+	"github.com/textures1245/go-template/handler"
+	"github.com/textures1245/go-template/model"
+	"github.com/textures1245/go-template/repository"
 
 	log "github.com/sirupsen/logrus"
 )
