@@ -2,10 +2,13 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 
 	"github.com/jmoiron/sqlx"
 
 	"github.com/gofiber/fiber/v2/log"
+	_authEntities "github.com/textures1245/go-template/internal/auth/entities"
 	"github.com/textures1245/go-template/internal/user"
 	"github.com/textures1245/go-template/internal/user/entities"
 	"github.com/textures1245/go-template/internal/user/repository/repository_query"
@@ -23,6 +26,21 @@ func NewUserRepository(db *sqlx.DB) user.UserRepository {
 	}
 }
 
+func (r *userRepo) FindUserAsPassport(ctx context.Context, email string) (userData *_authEntities.UsersPassport, _ error) {
+	// checking if user email was founded
+	err := r.db.QueryRowx(repository_query.FindUserByEmail, email).StructScan(userData)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, errors.New("UserUniqueEmailNotFound")
+		} else {
+			return nil, err
+
+		}
+	}
+
+	return userData, nil
+}
+
 func (r *userRepo) FindUserByUsernameAndPassword(ctx context.Context, req *entities.UserLoginReq) (userData *entities.User, _ error) {
 	err := r.db.QueryRowxContext(ctx, repository_query.FindUserById, req).StructScan(userData)
 	if err != nil {
@@ -35,7 +53,7 @@ func (r *userRepo) FindUserByUsernameAndPassword(ctx context.Context, req *entit
 }
 
 func (r *userRepo) GetUsers(ctx context.Context) (users []*entities.User, _ error) {
-	rows, err := r.db.Queryx(repository_query.GetUsers)
+	rows, err := r.db.QueryxContext(ctx, repository_query.GetUsers)
 	if err != nil {
 		log.Info(err)
 		return nil, err
@@ -57,7 +75,6 @@ func (r *userRepo) GetUsers(ctx context.Context) (users []*entities.User, _ erro
 
 func (r *userRepo) GetUserById(ctx context.Context, userID int64) (userData *entities.User, error error) {
 	// query := "SELECT * FROM User WHERE id = ?"
-
 	err := r.db.QueryRowxContext(ctx, repository_query.FindUserById, userID).StructScan(userData)
 	if err != nil {
 		log.Error(err)
@@ -75,7 +92,10 @@ func (r *userRepo) CreateUser(ctx context.Context, user *entities.UserCreatedReq
 		user.Password,
 		user.Email,
 		user.PhoneNumber,
+		user.IdCard,
 	}
+
+	log.Info(args)
 
 	res, err := r.db.ExecContext(ctx, repository_query.InsertUser, args...)
 	if err != nil {
