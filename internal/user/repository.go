@@ -1,11 +1,14 @@
 package user
 
 import (
-	"github.com/textures1245/go-template/internal/user/dtos"
+	"context"
+
 	"github.com/textures1245/go-template/internal/user/entities"
 )
 
 type UserRepository interface {
-	FindUser(req *entities.UserLogin) (*dtos.User, error)
-	FetchUser() ([]dtos.User, error)
+	FindUserByUsernameAndPassword(ctx context.Context, req *entities.UserLoginReq) (*entities.User, error)
+	CreateUser(ctx context.Context, user *entities.User) (*entities.User, error)
+	GetUsers(ctx context.Context) ([]*entities.User, error)
+	GetUserById(ctx context.Context, userID int64) (*entities.User, error)
 }

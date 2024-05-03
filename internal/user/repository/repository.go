@@ -1,64 +1,88 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/jmoiron/sqlx"
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/textures1245/go-template/internal/user"
-	"github.com/textures1245/go-template/internal/user/dtos"
 	"github.com/textures1245/go-template/internal/user/entities"
-	"github.com/textures1245/go-template/pkg/datasource"
+	"github.com/textures1245/go-template/internal/user/repository/repository_query"
+	// "github.com/textures1245/go-template/pkg/datasource"
 )
 
 type userRepo struct {
-	db   *sqlx.DB
-	conn datasource.ConnTx
+	db *sqlx.DB
 }
 
 func NewUserRepository(db *sqlx.DB) user.UserRepository {
 	return &userRepo{
-		db:   db,
-		conn: db,
+		db: db,
 	}
 }
 
-func (r *userRepo) FindUser(req *entities.UserLogin) (*dtos.User, error) {
-	query := "SELECT * FROM User WHERE username = ? AND password = ?"
-	row := r.db.QueryRow(query, req.Username, req.Password)
-	log.Info(row)
-
-	var user dtos.User
-	err := row.Scan(&user.ID, &user.Username, &user.Password, &user.CreateAt, &user.UpdateAt)
+func (r *userRepo) FindUserByUsernameAndPassword(ctx context.Context, req *entities.UserLoginReq) (userData *entities.User, _ error) {
+	err := r.db.QueryRowxContext(ctx, repository_query.FindUserById, req).StructScan(userData)
 	if err != nil {
-		log.Info(err)
-		return &user, err
+		log.Error(err)
+		return nil, err
 	}
 
-	return &user, nil
+	return userData, nil
 
 }
 
-func (r *userRepo) FetchUser() ([]dtos.User, error) {
-	log.Debug("FetchUser")
-	query := "SELECT * FROM User"
-	log.Debug(r.db)
-	rows, err := r.db.Query(query)
+func (r *userRepo) GetUsers(ctx context.Context) (users []*entities.User, _ error) {
+	rows, err := r.db.Queryx(repository_query.GetUsers)
 	if err != nil {
 		log.Info(err)
 		return nil, err
 	}
 	defer rows.Close()
 
-	var users []dtos.User
 	for rows.Next() {
-		var user dtos.User
-		err := rows.Scan(&user.ID, &user.Username, &user.Password, &user.CreateAt, &user.UpdateAt)
+		var user entities.User
+		err := rows.StructScan(&user)
 		if err != nil {
 			log.Info(err)
 			return nil, err
 		}
-		users = append(users, user)
+		users = append(users, &user)
 	}
 
 	return users, nil
 }
+
+func (r *userRepo) GetUserById(ctx context.Context, userID int64) (userData *entities.User, error error) {
+	// query := "SELECT * FROM User WHERE id = ?"
+
+	err := r.db.QueryRowxContext(ctx, repository_query.FindUserById, userID).StructScan(userData)
+	if err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	return userData, nil
+}
+
+func (r *userRepo) CreateUser(ctx context.Context, user *entities.User) (*entities.User, error) {
+	_, err := r.db.ExecContext(ctx, repository_query.InsertUser, user.Username, user.Password)
+	if err != nil {
+		log.Info(err)
+		return nil, err
+	}
+
+	return user, nil
+}
+
+// func (r *userRepo) CreateUser(user *entities.User) error {
+// 	query := "INSERT INTO User (username, password) VALUES (?, ?)"
+// 	_, err := r.db.Exec(query, user.Username, user.Password)
+// 	if err != nil {
+// 		log.Info(err)
+// 		return err
+// 	}
+
+// 	return nil
+// }
