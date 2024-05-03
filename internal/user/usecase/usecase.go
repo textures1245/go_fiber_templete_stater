@@ -37,8 +37,10 @@ func (u *userUsecase) OnFetchUsers(ctx context.Context) ([]*dtos.UserDetailRespo
 		return nil, http.StatusInternalServerError, err
 	}
 
+	// the problem was found here when trying to casting the user to the UserDetailRespond
 	var res []*dtos.UserDetailRespond
 	for _, user := range users {
+
 		res = append(res, entities.NewUserDetail(user))
 	}
 

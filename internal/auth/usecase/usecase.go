@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/textures1245/go-template/internal/auth"
 	"github.com/textures1245/go-template/internal/auth/dtos"
 	_authEntities "github.com/textures1245/go-template/internal/auth/entities"
@@ -74,11 +75,12 @@ func (u *authUse) Register(ctx context.Context, req *_userEntities.UserCreatedRe
 		Password: string(hashedPassword),
 	}
 	req.Password = cred.Password
-
+	log.Info("req", req)
 	user, err := u.UsersRepo.CreateUser(ctx, req)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
+	log.Info("res", user)
 
 	userToken, err := u.AuthRepo.SignUsersAccessToken(&struct {
 		Id    int64
