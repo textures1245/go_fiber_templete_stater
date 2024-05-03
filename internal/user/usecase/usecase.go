@@ -1,7 +1,9 @@
 package usecase
 
 import (
-	"github.com/gofiber/fiber/v2/log"
+	"context"
+	"net/http"
+
 	"github.com/textures1245/go-template/internal/user"
 	"github.com/textures1245/go-template/internal/user/dtos"
 	"github.com/textures1245/go-template/internal/user/entities"
@@ -17,27 +19,38 @@ func NewUserUsecase(userRepo user.UserRepository) user.UserUsecase {
 	}
 }
 
-func (u *userUsecase) OnFindUser(req *entities.UserLogin) (*dtos.User, error) {
+func (u *userUsecase) OnUserLogin(ctx context.Context, req *entities.UserLoginReq) (*dtos.UserLoginResponse, int, error) {
 
-	user, err := u.userRepo.FindUser(req)
-	log.Info(user)
+	user, err := u.userRepo.FindUserByUsernameAndPassword(ctx, req)
 
 	if err != nil {
-		return nil, err
+		return nil, http.StatusInternalServerError, err
 	}
 
-	return user, nil
+	return entities.NewUserLogin(user), http.StatusOK, nil
 }
 
-func (u *userUsecase) OnFetchUser() ([]dtos.User, error) {
+func (u *userUsecase) OnFetchUsers(ctx context.Context) ([]*dtos.UserDetailRespond, int, error) {
 
-	users, err := u.userRepo.FetchUser()
-	log.Info(users)
-
+	users, err := u.userRepo.GetUsers(ctx)
 	if err != nil {
-		log.Debug("Logged 3")
-		return nil, err
+		return nil, http.StatusInternalServerError, err
 	}
 
-	return users, nil
+	var res []*dtos.UserDetailRespond
+	for _, user := range users {
+		res = append(res, entities.NewUserDetail(user))
+	}
+
+	return res, http.StatusOK, nil
+}
+
+func (u *userUsecase) OnFetchUserById(ctx context.Context, userId int64) (*dtos.UserDetailRespond, int, error) {
+
+	user, err := u.userRepo.GetUserById(ctx, userId)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	return entities.NewUserDetail(user), http.StatusOK, nil
 }
