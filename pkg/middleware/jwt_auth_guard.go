@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/spf13/viper"
 )
 
 func JwtAuthentication() fiber.Handler {
@@ -26,7 +26,7 @@ func JwtAuthentication() fiber.Handler {
 
 		}
 
-		secretKey := os.Getenv("JWT_SECRET_TOKEN")
+		secretKey := viper.GetString("JWT_SECRET_TOKEN")
 		token, err := jwt.Parse(accessToken, func(token *jwt.Token) (interface{}, error) {
 			// Don't forget to validate the alg is what you expect:
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
