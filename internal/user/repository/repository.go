@@ -9,6 +9,7 @@ import (
 	"github.com/textures1245/go-template/internal/user"
 	"github.com/textures1245/go-template/internal/user/entities"
 	"github.com/textures1245/go-template/internal/user/repository/repository_query"
+	"github.com/textures1245/go-template/pkg/utils"
 	// "github.com/textures1245/go-template/pkg/datasource"
 )
 
@@ -66,14 +67,25 @@ func (r *userRepo) GetUserById(ctx context.Context, userID int64) (userData *ent
 	return userData, nil
 }
 
-func (r *userRepo) CreateUser(ctx context.Context, user *entities.User) (*entities.User, error) {
-	_, err := r.db.ExecContext(ctx, repository_query.InsertUser, user.Username, user.Password)
+func (r *userRepo) CreateUser(ctx context.Context, user *entities.UserCreatedReq) (*int64, error) {
+
+	args := utils.Array{
+		user.Name,
+		user.Username,
+		user.Password,
+		user.Email,
+		user.PhoneNumber,
+	}
+
+	res, err := r.db.ExecContext(ctx, repository_query.InsertUser, args...)
 	if err != nil {
 		log.Info(err)
 		return nil, err
 	}
 
-	return user, nil
+	userId, _ := res.RowsAffected()
+
+	return &userId, nil
 }
 
 // func (r *userRepo) CreateUser(user *entities.User) error {
