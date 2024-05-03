@@ -8,6 +8,7 @@ func NewUserDetail(dat *User) *dtos.UserDetailRespond {
 		Name:        dat.Name,
 		Email:       dat.Email,
 		PhoneNumber: dat.PhoneNumber,
+		IdCard:      dat.IdCard,
 		CreatedAt:   dat.CreatedAt,
 		UpdatedAt:   dat.UpdatedAt,
 	}
