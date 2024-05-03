@@ -2,11 +2,11 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 
 	_ "github.com/denisenkom/go-mssqldb"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 	log "github.com/sirupsen/logrus"
 	"github.com/textures1245/go-template/util"
 
@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	Db       *sql.DB
+	Db       *sqlx.DB
 	server   string
 	port     int
 	user     string
@@ -37,7 +37,7 @@ func init() {
 	log.Debug(connString)
 
 	// Create connection pool
-	Db, err := sql.Open("mysql", connString)
+	Db, err := sqlx.Open("mysql", connString)
 
 	// db, err := sql.Open("mysql", "userName:password@tcp(123.45.67.89:3030)/myDB")
 	if err != nil {
@@ -56,7 +56,7 @@ func init() {
 
 }
 
-func GetDb() *sql.DB {
+func GetDb() *sqlx.DB {
 	var err error
 
 	if Db == nil {
@@ -65,7 +65,7 @@ func GetDb() *sql.DB {
 		log.Debug(connString)
 
 		// Create connection pool
-		Db, err = sql.Open("mysql", connString)
+		Db, err = sqlx.Open("mysql", connString)
 		if err != nil {
 			log.Error("#### Error creating connection pool: " + err.Error())
 		}
