@@ -24,12 +24,12 @@ func NewAuthRepository(db *sqlx.DB) auth.AuthRepository {
 }
 
 func (r *authRepo) SignUsersAccessToken(req *struct {
-	Id    int64
-	Email string
+	Id       int64
+	Username string
 }) (*dtos.UserTokenRes, error) {
 	claims := entities.UsersClaims{
-		Id:    req.Id,
-		Email: req.Email,
+		Id:       req.Id,
+		Username: req.Username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
