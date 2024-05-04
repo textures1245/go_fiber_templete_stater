@@ -1,7 +1,7 @@
 package entities
 
 type User struct {
-	ID          int    `json:"id" db:"id"`
+	Id          int64  `json:"id" db:"id"`
 	Name        string `json:"name" db:"name"`
 	Username    string `json:"username" db:"username"`
 	Password    string `json:"password" db:"password"`
