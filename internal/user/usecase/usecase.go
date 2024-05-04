@@ -56,3 +56,14 @@ func (u *userUsecase) OnFetchUserById(ctx context.Context, userId int64) (*dtos.
 
 	return entities.NewUserDetail(user), http.StatusOK, nil
 }
+
+func (u *userUsecase) OnUpdateUserById(ctx context.Context, userId int64, req *entities.UserUpdateReq) (int, error) {
+
+	err := u.userRepo.UpdateUserById(ctx, userId, req)
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}

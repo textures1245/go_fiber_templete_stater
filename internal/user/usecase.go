@@ -11,4 +11,5 @@ type UserUsecase interface {
 	OnUserLogin(ctx context.Context, req *entities.UserLoginReq) (*dtos.UserLoginResponse, int, error) // Replace "content.Context" with "context.Context"
 	OnFetchUsers(ctx context.Context) ([]*dtos.UserDetailRespond, int, error)                          // Replace "content.Context" with "context.Context"
 	OnFetchUserById(ctx context.Context, userId int64) (*dtos.UserDetailRespond, int, error)
+	OnUpdateUserById(ctx context.Context, userId int64, req *entities.UserUpdateReq) (int, error)
 }

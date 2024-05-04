@@ -17,4 +17,7 @@ var (
 
 	//go:embed user/find_user_by_username.sql
 	FindUserByUsername string
+
+	//go:embed user/update_user_by_id.sql
+	UpdateUserById string
 )

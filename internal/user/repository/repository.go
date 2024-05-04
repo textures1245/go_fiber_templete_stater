@@ -119,6 +119,26 @@ func (r *userRepo) CreateUser(ctx context.Context, user *entities.UserCreatedReq
 	return &userId, nil
 }
 
+func (r *userRepo) UpdateUserById(ctx context.Context, userID int64, user *entities.UserUpdateReq) error {
+	args := utils.Array{
+		user.Name,
+		user.Email,
+		user.IdCard,
+		user.PhoneNumber,
+		userID,
+	}
+
+	log.Info(args)
+
+	_, err := r.db.ExecContext(ctx, repository_query.UpdateUserById, args...)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	return nil
+}
+
 // func (r *userRepo) CreateUser(user *entities.User) error {
 // 	query := "INSERT INTO User (username, password) VALUES (?, ?)"
 // 	_, err := r.db.Exec(query, user.Username, user.Password)
