@@ -1,6 +1,6 @@
 package entities
 
 type UsersCredentials struct {
-	Email    string `json:"email" db:"email" form:"email" binding:"required" validate:"required,email"`
+	Username string `json:"username" db:"username" form:"username" binding:"required" validate:"required,username"`
 	Password string `json:"password" db:"password" form:"password" binding:"required" validate:"required,min=5"`
 }
