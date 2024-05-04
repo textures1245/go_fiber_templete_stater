@@ -1,7 +1,7 @@
 package dtos
 
 type UserLoginResponse struct {
-	ID        int    `json:"id"`
+	Id        int64  `json:"id"`
 	Name      string `json:"name"`
 	Email     string `json:"email"`
 	UpdatedAt string `json:"updated_at"`

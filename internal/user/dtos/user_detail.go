@@ -1,7 +1,7 @@
 package dtos
 
 type UserDetailRespond struct {
-	ID          int    `json:"id"`
+	Id          int64  `json:"id"`
 	Name        string `json:"name"`
 	Email       string `json:"email" db:"email"`
 	PhoneNumber string `json:"phone_number" db:"phone_number"`
