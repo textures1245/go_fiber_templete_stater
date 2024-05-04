@@ -8,12 +8,12 @@ import (
 )
 
 var (
-	ErrorUnauthorized         = errors.New("dbUnauthorized")
-	ErrorDatabaseNotFound     = errors.New("databaseNotFound")
-	ErrorDuplicateEntry       = errors.New("username already exists")
-	ErrorTableNotFound        = errors.New("user table not found")
-	ErrorForeignKeyConstraint = errors.New("cant create or update User: a foreign key constraint fails")
-	ErrorMySQLConnection      = errors.New("cantConnectToMySQLServer")
+	errorUnauthorized         = errors.New("dbUnauthorized")
+	errorDatabaseNotFound     = errors.New("databaseNotFound")
+	errorDuplicateEntry       = errors.New("username already exists")
+	errorTableNotFound        = errors.New("user table not found")
+	errorForeignKeyConstraint = errors.New("cant create or update User: a foreign key constraint fails")
+	errorMySQLConnection      = errors.New("cantConnectToMySQLServer")
 )
 
 func HandleAuthError(err error) (int, error) {
@@ -22,17 +22,17 @@ func HandleAuthError(err error) (int, error) {
 	if errors.As(err, &mysqlErr) {
 		switch mysqlErr.Number {
 		case 1045:
-			return http.StatusUnauthorized, ErrorUnauthorized
+			return http.StatusUnauthorized, errorUnauthorized
 		case 1049:
-			return http.StatusNotFound, ErrorDatabaseNotFound
+			return http.StatusNotFound, errorDatabaseNotFound
 		case 1062:
-			return http.StatusConflict, ErrorDuplicateEntry
+			return http.StatusConflict, errorDuplicateEntry
 		case 1146:
-			return http.StatusNotFound, ErrorTableNotFound
+			return http.StatusNotFound, errorTableNotFound
 		case 1217, 1452:
-			return http.StatusConflict, ErrorForeignKeyConstraint
+			return http.StatusConflict, errorForeignKeyConstraint
 		case 2002:
-			return http.StatusServiceUnavailable, ErrorMySQLConnection
+			return http.StatusServiceUnavailable, errorMySQLConnection
 		}
 	}
 	return http.StatusInternalServerError, err
