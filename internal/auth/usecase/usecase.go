@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/textures1245/go-template/internal/auth"
@@ -30,7 +29,7 @@ func NewAuthService(authRepo auth.AuthRepository, usersRepo user.UserRepository)
 
 func (u *authUse) Login(ctx context.Context, req *_authEntities.UsersCredentials) (*dtos.UserTokenRes, int, error) {
 
-	user, err := u.UsersRepo.FindUserAsPassport(ctx, req.Email)
+	user, err := u.UsersRepo.FindUserAsPassport(ctx, req.Username)
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
@@ -40,21 +39,22 @@ func (u *authUse) Login(ctx context.Context, req *_authEntities.UsersCredentials
 		return nil, http.StatusBadRequest, errors.New("error, password is invalid")
 	}
 
-	userId, err := strconv.ParseInt(user.Id, 10, 64)
-	if err != nil {
-		return nil, http.StatusInternalServerError, err
-	}
+	// userId, err := strconv.ParseInt(user.Id, 10, 64)
+	// if err != nil {
+	// 	return nil, http.StatusInternalServerError, err
+	// }
 
 	userToken, err := u.AuthRepo.SignUsersAccessToken(&struct {
-		Id    int64
-		Email string
+		Id       int64
+		Username string
 	}{
-		Id:    userId,
-		Email: req.Email,
+		Id:       user.Id,
+		Username: req.Username,
 	})
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
+
 	// res := &dtos.UsersLoginRes{
 	// 	AccessToken: userToken.AccessToken,
 	// 	CreatedAt:   userToken.IssuedAt,
@@ -71,7 +71,7 @@ func (u *authUse) Register(ctx context.Context, req *_userEntities.UserCreatedRe
 	}
 
 	cred := _authEntities.UsersCredentials{
-		Email:    req.Email,
+		Username: req.Username,
 		Password: string(hashedPassword),
 	}
 	req.Password = cred.Password
@@ -83,11 +83,11 @@ func (u *authUse) Register(ctx context.Context, req *_userEntities.UserCreatedRe
 	log.Info("res", user)
 
 	userToken, err := u.AuthRepo.SignUsersAccessToken(&struct {
-		Id    int64
-		Email string
+		Id       int64
+		Username string
 	}{
-		Id:    *user,
-		Email: req.Email,
+		Id:       *user,
+		Username: req.Username,
 	})
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
