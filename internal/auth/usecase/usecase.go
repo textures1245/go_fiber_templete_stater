@@ -12,6 +12,7 @@ import (
 	_authEntities "github.com/textures1245/go-template/internal/auth/entities"
 	"github.com/textures1245/go-template/internal/user"
 	_userEntities "github.com/textures1245/go-template/internal/user/entities"
+	"github.com/textures1245/go-template/pkg/apperror"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -31,18 +32,14 @@ func (u *authUse) Login(ctx context.Context, req *_authEntities.UsersCredentials
 
 	user, err := u.UsersRepo.FindUserAsPassport(ctx, req.Username)
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		status, newErr := apperror.HandleAuthError(err)
+		return nil, status, newErr
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		fmt.Println(err.Error())
 		return nil, http.StatusBadRequest, errors.New("error, password is invalid")
 	}
-
-	// userId, err := strconv.ParseInt(user.Id, 10, 64)
-	// if err != nil {
-	// 	return nil, http.StatusInternalServerError, err
-	// }
 
 	userToken, err := u.AuthRepo.SignUsersAccessToken(&struct {
 		Id       int64
@@ -52,14 +49,10 @@ func (u *authUse) Login(ctx context.Context, req *_authEntities.UsersCredentials
 		Username: req.Username,
 	})
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		status, newErr := apperror.HandleAuthError(err)
+		return nil, status, newErr
 	}
 
-	// res := &dtos.UsersLoginRes{
-	// 	AccessToken: userToken.AccessToken,
-	// 	CreatedAt:   userToken.IssuedAt,
-	// 	ExpiredAt:   userToken.ExpiresIn,
-	// }
 	return userToken, http.StatusOK, nil
 }
 
@@ -78,7 +71,8 @@ func (u *authUse) Register(ctx context.Context, req *_userEntities.UserCreatedRe
 	log.Info("req", req)
 	user, err := u.UsersRepo.CreateUser(ctx, req)
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		status, newErr := apperror.HandleAuthError(err)
+		return nil, status, newErr
 	}
 	log.Info("res", user)
 
@@ -90,7 +84,8 @@ func (u *authUse) Register(ctx context.Context, req *_userEntities.UserCreatedRe
 		Username: req.Username,
 	})
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		status, newErr := apperror.HandleAuthError(err)
+		return nil, status, newErr
 	}
 
 	res := &dtos.UsersRegisteredRes{
