@@ -9,7 +9,7 @@ type UserLoginReq struct {
 
 func NewUserLogin(dat *User) *dtos.UserLoginResponse {
 	return &dtos.UserLoginResponse{
-		ID:        dat.ID,
+		Id:        dat.Id,
 		Name:      dat.Name,
 		Email:     dat.Email,
 		UpdatedAt: dat.UpdatedAt,
