@@ -3,4 +3,4 @@ SELECT
 FROM
     User
 WHERE
-    email = ?
+    username = ?
