@@ -15,6 +15,6 @@ var (
 	//go:embed user/insert.sql
 	InsertUser string
 
-	//go:embed user/find_user_by_email.sql
-	FindUserByEmail string
+	//go:embed user/find_user_by_username.sql
+	FindUserByUsername string
 )

@@ -26,19 +26,30 @@ func NewUserRepository(db *sqlx.DB) user.UserRepository {
 	}
 }
 
-func (r *userRepo) FindUserAsPassport(ctx context.Context, email string) (userData *_authEntities.UsersPassport, _ error) {
+func (r *userRepo) FindUserAsPassport(ctx context.Context, username string) (*_authEntities.UsersPassport, error) {
 	// checking if user email was founded
-	err := r.db.QueryRowx(repository_query.FindUserByEmail, email).StructScan(userData)
+
+	userData := &entities.User{}
+
+	err := r.db.QueryRowx(repository_query.FindUserByUsername, username).StructScan(userData)
+	log.Info(username)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, errors.New("UserUniqueEmailNotFound")
+			return nil, errors.New("UserUniqueUsernameNotFound")
 		} else {
+			log.Error(err)
 			return nil, err
 
 		}
 	}
 
-	return userData, nil
+	userPassport := &_authEntities.UsersPassport{
+		Id:       userData.Id,
+		Username: userData.Username,
+		Password: userData.Password,
+	}
+
+	return userPassport, nil
 }
 
 func (r *userRepo) FindUserByUsernameAndPassword(ctx context.Context, req *entities.UserLoginReq) (userData *entities.User, _ error) {
