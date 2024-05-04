@@ -4,7 +4,7 @@ import "github.com/textures1245/go-template/internal/auth/dtos"
 
 type AuthRepository interface {
 	SignUsersAccessToken(req *struct {
-		Id    int64
-		Email string
+		Id       int64
+		Username string
 	}) (*dtos.UserTokenRes, error)
 }
