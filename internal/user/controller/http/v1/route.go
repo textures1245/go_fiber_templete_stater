@@ -12,7 +12,7 @@ import (
 )
 
 func UseUserRoute(db *sqlx.DB, app *fiber.App) {
-	userR := app.Group("/api/user", func(c *fiber.Ctx) error {
+	userR := app.Group("/api/v1/user", func(c *fiber.Ctx) error {
 		if !strings.Contains(c.Request().URI().String(), "/ping") {
 			log.Infof("all : %v", c.Request().URI().String())
 		}
@@ -27,7 +27,8 @@ func UseUserRoute(db *sqlx.DB, app *fiber.App) {
 
 	userR.Get("/get-users", middleware.JwtAuthentication(), userConn.FetchUsers)
 	userR.Get("/:user_id", middleware.JwtAuthentication(), userConn.FetchUserById)
-	userR.Patch("/:user_id", middleware.JwtAuthentication(), userConn.UpdateUserById)
-	userR.Delete("/:user_id", middleware.JwtAuthentication(), userConn.DeleteUserById)
+	userR.Patch("/:user_id", middleware.JwtAuthentication(), middleware.PermissionGuard(), userConn.UpdateUserById)
+	userR.Delete("/:user_id", middleware.JwtAuthentication(), middleware.PermissionGuard([]interface{}{"PREVENT_DEFAULT_ACTION"}), userConn.DeleteUserById)
 
+	// TODO: test mdw with opt and without opt
 }
