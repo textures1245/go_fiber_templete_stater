@@ -8,7 +8,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
-func CustomSqlExecuteHandler(modelName string, err error) (int, *cErr) {
+func CustomSqlExecuteHandler(modelName string, err error) (int, *CErr) {
 	if errors.Is(err, sql.ErrNoRows) {
 		return http.StatusNotFound, NewCErr(errors.New(modelName+" not found"), err)
 	}

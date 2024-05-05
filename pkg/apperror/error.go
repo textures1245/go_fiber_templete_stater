@@ -1,16 +1,16 @@
 package apperror
 
-type cErr struct {
+type CErr struct {
 	CError   error
 	RawError error
 }
 
-func (e *cErr) Error() (string, string) {
+func (e *CErr) Error() (string, string) {
 	return e.CError.Error(), e.RawError.Error()
 }
 
-func NewCErr(cError error, rawError error) *cErr {
-	return &cErr{
+func NewCErr(cError error, rawError error) *CErr {
+	return &CErr{
 		CError:   cError,
 		RawError: rawError,
 	}

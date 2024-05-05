@@ -16,24 +16,24 @@ var (
 	errorMySQLConnection      = errors.New("cantConnectToMySQLServer")
 )
 
-func HandleAuthError(err error) (int, error) {
+func HandleAuthError(err error) (int, *CErr) {
 	var mysqlErr *mysql.MySQLError
 
 	if errors.As(err, &mysqlErr) {
 		switch mysqlErr.Number {
 		case 1045:
-			return http.StatusUnauthorized, errorUnauthorized
+			return http.StatusUnauthorized, NewCErr(errorUnauthorized, err)
 		case 1049:
-			return http.StatusNotFound, errorDatabaseNotFound
+			return http.StatusNotFound, NewCErr(errorDatabaseNotFound, err)
 		case 1062:
-			return http.StatusConflict, errorDuplicateEntry
+			return http.StatusConflict, NewCErr(errorDuplicateEntry, err)
 		case 1146:
-			return http.StatusNotFound, errorTableNotFound
+			return http.StatusNotFound, NewCErr(errorTableNotFound, err)
 		case 1217, 1452:
-			return http.StatusConflict, errorForeignKeyConstraint
+			return http.StatusConflict, NewCErr(errorForeignKeyConstraint, err)
 		case 2002:
-			return http.StatusServiceUnavailable, errorMySQLConnection
+			return http.StatusServiceUnavailable, NewCErr(errorMySQLConnection, err)
 		}
 	}
-	return http.StatusInternalServerError, err
+	return http.StatusInternalServerError, NewCErr(errors.New("UnknownCustomErrorCanNotBeMade"), err)
 }
