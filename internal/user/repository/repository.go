@@ -52,7 +52,8 @@ func (r *userRepo) FindUserAsPassport(ctx context.Context, username string) (*_a
 	return userPassport, nil
 }
 
-func (r *userRepo) FindUserByUsernameAndPassword(ctx context.Context, req *entities.UserLoginReq) (userData *entities.User, _ error) {
+func (r *userRepo) FindUserByUsernameAndPassword(ctx context.Context, req *entities.UserLoginReq) (*entities.User, error) {
+	userData := &entities.User{}
 	err := r.db.QueryRowxContext(ctx, repository_query.FindUserById, req).StructScan(userData)
 	if err != nil {
 		log.Error(err)
@@ -63,7 +64,9 @@ func (r *userRepo) FindUserByUsernameAndPassword(ctx context.Context, req *entit
 
 }
 
-func (r *userRepo) GetUsers(ctx context.Context) (users []*entities.User, _ error) {
+func (r *userRepo) GetUsers(ctx context.Context) ([]*entities.User, error) {
+	users := []*entities.User{}
+
 	rows, err := r.db.QueryxContext(ctx, repository_query.GetUsers)
 	if err != nil {
 		log.Info(err)
@@ -84,7 +87,9 @@ func (r *userRepo) GetUsers(ctx context.Context) (users []*entities.User, _ erro
 	return users, nil
 }
 
-func (r *userRepo) GetUserById(ctx context.Context, userID int64) (userData *entities.User, error error) {
+func (r *userRepo) GetUserById(ctx context.Context, userID int64) (*entities.User, error) {
+	userData := &entities.User{}
+
 	// query := "SELECT * FROM User WHERE id = ?"
 	err := r.db.QueryRowxContext(ctx, repository_query.FindUserById, userID).StructScan(userData)
 	if err != nil {
