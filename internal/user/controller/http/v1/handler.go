@@ -25,11 +25,11 @@ func NewUserController(userUse user.UserUsecase) *userCon {
 func (con userCon) UpdateUserById(c *fiber.Ctx) error {
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
-		reqP        = c.Get("user_id")
+		reqP        = c.Params("user_id")
 	)
 	defer cancel()
 
-	if reqP != "" {
+	if reqP == "" {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"status":      http.StatusText(http.StatusBadRequest),
 			"status_code": http.StatusBadRequest,
@@ -113,7 +113,7 @@ func (con *userCon) FetchUsers(c *fiber.Ctx) error {
 func (con *userCon) FetchUserById(c *fiber.Ctx) error {
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
-		reqP        = c.Get("user_id")
+		reqP        = c.Params("user_id")
 	)
 	defer cancel()
 
@@ -159,7 +159,7 @@ func (con *userCon) FetchUserById(c *fiber.Ctx) error {
 func (con *userCon) DeleteUserById(c *fiber.Ctx) error {
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
-		reqP        = c.Get("user_id")
+		reqP        = c.Params("user_id")
 	)
 	defer cancel()
 
