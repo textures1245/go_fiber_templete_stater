@@ -20,4 +20,7 @@ var (
 
 	//go:embed user/update_user_by_id.sql
 	UpdateUserById string
+
+	//go:embed user/delete_user_by_id.sql
+	DeleteUserById string
 )

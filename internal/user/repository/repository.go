@@ -139,13 +139,12 @@ func (r *userRepo) UpdateUserById(ctx context.Context, userID int64, user *entit
 	return nil
 }
 
-// func (r *userRepo) CreateUser(user *entities.User) error {
-// 	query := "INSERT INTO User (username, password) VALUES (?, ?)"
-// 	_, err := r.db.Exec(query, user.Username, user.Password)
-// 	if err != nil {
-// 		log.Info(err)
-// 		return err
-// 	}
+func (r *userRepo) DeleteUserById(ctx context.Context, userID int64) error {
+	_, err := r.db.ExecContext(ctx, repository_query.DeleteUserById, userID)
+	if err != nil {
+		log.Error(err)
+		return err
+	}
 
-// 	return nil
-// }
+	return nil
+}

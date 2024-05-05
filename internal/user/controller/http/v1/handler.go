@@ -113,7 +113,7 @@ func (con *userCon) FetchUsers(c *fiber.Ctx) error {
 func (con *userCon) FetchUserById(c *fiber.Ctx) error {
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
-		reqP        = c.Get("userId")
+		reqP        = c.Get("user_id")
 	)
 	defer cancel()
 
@@ -121,7 +121,7 @@ func (con *userCon) FetchUserById(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"status":      http.StatusText(http.StatusBadRequest),
 			"status_code": http.StatusBadRequest,
-			"message":     "userId params is required",
+			"message":     "user_id params is required",
 			"result":      nil,
 		})
 	}
@@ -153,5 +153,53 @@ func (con *userCon) FetchUserById(c *fiber.Ctx) error {
 		"status_code": status,
 		"message":     "",
 		"result":      users,
+	})
+}
+
+func (con *userCon) DeleteUserById(c *fiber.Ctx) error {
+	var (
+		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
+		reqP        = c.Get("user_id")
+	)
+	defer cancel()
+
+	if reqP == "" {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"status":      http.StatusText(http.StatusBadRequest),
+			"status_code": http.StatusBadRequest,
+			"message":     "userId params is required",
+			"raw_message": "",
+			"result":      nil,
+		})
+	}
+
+	userId, err := strconv.ParseInt(reqP, 10, 64)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"status":      http.StatusText(http.StatusBadRequest),
+			"status_code": http.StatusBadRequest,
+			"message":     "error, invalid userId params",
+			"raw_message": err.Error(),
+			"result":      nil,
+		})
+	}
+
+	status, err := con.userUse.UserDeleted(ctx, userId)
+	if err != nil {
+		status, cE := apperror.CustomSqlExecuteHandler("User", err)
+		return c.Status(status).JSON(fiber.Map{
+			"status":      http.StatusText(status),
+			"status_code": status,
+			"message":     cE.CError.Error(),
+			"raw_message": cE.RawError.Error(),
+			"result":      nil,
+		})
+	}
+
+	return c.Status(status).JSON(fiber.Map{
+		"status":      http.StatusText(status),
+		"status_code": status,
+		"message":     "user deleted successfully",
+		"result":      nil,
 	})
 }

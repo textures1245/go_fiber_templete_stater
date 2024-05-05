@@ -12,4 +12,5 @@ type UserUsecase interface {
 	OnFetchUsers(ctx context.Context) ([]*dtos.UserDetailRespond, int, error)                          // Replace "content.Context" with "context.Context"
 	OnFetchUserById(ctx context.Context, userId int64) (*dtos.UserDetailRespond, int, error)
 	OnUpdateUserById(ctx context.Context, userId int64, req *entities.UserUpdateReq) (int, error)
+	UserDeleted(ctx context.Context, userId int64) (int, error)
 }

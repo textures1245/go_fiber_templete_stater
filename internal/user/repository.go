@@ -14,4 +14,5 @@ type UserRepository interface {
 	FindUserAsPassport(ctx context.Context, email string) (*_authEntities.UsersPassport, error)
 	GetUserById(ctx context.Context, userID int64) (*_userEntities.User, error)
 	UpdateUserById(ctx context.Context, userID int64, user *_userEntities.UserUpdateReq) error
+	DeleteUserById(ctx context.Context, userID int64) error
 }

@@ -67,3 +67,14 @@ func (u *userUsecase) OnUpdateUserById(ctx context.Context, userId int64, req *e
 
 	return http.StatusOK, nil
 }
+
+func (u *userUsecase) UserDeleted(ctx context.Context, userId int64) (int, error) {
+
+	err := u.userRepo.DeleteUserById(ctx, userId)
+
+	if err != nil {
+		return http.StatusInternalServerError, err
+	}
+
+	return http.StatusOK, nil
+}
