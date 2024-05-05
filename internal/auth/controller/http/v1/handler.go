@@ -25,7 +25,11 @@ func (a *authConn) Login(c *fiber.Ctx) error {
 	req := new(entities.UsersCredentials)
 	if err := c.BodyParser(req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": err.Error(),
+			"status":      http.StatusText(http.StatusBadRequest),
+			"status_code": http.StatusBadRequest,
+			"message":     "error, invalid request body",
+			"raw_message": err.Error(),
+			"result":      nil,
 		})
 	}
 
@@ -40,7 +44,8 @@ func (a *authConn) Login(c *fiber.Ctx) error {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      http.StatusText(status),
 			"status_code": status,
-			"message":     err.Error(),
+			"message":     err.CError.Error(),
+			"raw_message": err.RawError.Error(),
 			"result":      nil,
 		})
 	}
@@ -57,7 +62,11 @@ func (a *authConn) Register(c *fiber.Ctx) error {
 	req := new(_userEntities.UserCreatedReq)
 	if err := c.BodyParser(req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": err.Error(),
+			"status":      http.StatusText(http.StatusBadRequest),
+			"status_code": http.StatusBadRequest,
+			"message":     "error, invalid request body",
+			"raw_message": err.Error(),
+			"result":      nil,
 		})
 	}
 
@@ -72,7 +81,8 @@ func (a *authConn) Register(c *fiber.Ctx) error {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      http.StatusText(status),
 			"status_code": status,
-			"message":     err.Error(),
+			"message":     err.CError.Error(),
+			"raw_message": err.RawError.Error(),
 			"result":      nil,
 		})
 	}

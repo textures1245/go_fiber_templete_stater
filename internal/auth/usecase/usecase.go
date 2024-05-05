@@ -28,17 +28,17 @@ func NewAuthService(authRepo auth.AuthRepository, usersRepo user.UserRepository)
 	}
 }
 
-func (u *authUse) Login(ctx context.Context, req *_authEntities.UsersCredentials) (*dtos.UserTokenRes, int, error) {
+func (u *authUse) Login(ctx context.Context, req *_authEntities.UsersCredentials) (*dtos.UserTokenRes, int, *apperror.CErr) {
 
 	user, err := u.UsersRepo.FindUserAsPassport(ctx, req.Username)
 	if err != nil {
-		status, newErr := apperror.HandleAuthError(err)
-		return nil, status, newErr
+		status, cErr := apperror.HandleAuthError(err)
+		return nil, status, cErr
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		fmt.Println(err.Error())
-		return nil, http.StatusBadRequest, errors.New("error, password is invalid")
+		return nil, http.StatusBadRequest, apperror.NewCErr(errors.New("error, password is invalid"), nil)
 	}
 
 	userToken, err := u.AuthRepo.SignUsersAccessToken(&struct {
@@ -49,18 +49,18 @@ func (u *authUse) Login(ctx context.Context, req *_authEntities.UsersCredentials
 		Username: req.Username,
 	})
 	if err != nil {
-		status, newErr := apperror.HandleAuthError(err)
-		return nil, status, newErr
+		status, cErr := apperror.HandleAuthError(err)
+		return nil, status, cErr
 	}
 
 	return userToken, http.StatusOK, nil
 }
 
-func (u *authUse) Register(ctx context.Context, req *_userEntities.UserCreatedReq) (*dtos.UsersRegisteredRes, int, error) {
+func (u *authUse) Register(ctx context.Context, req *_userEntities.UserCreatedReq) (*dtos.UsersRegisteredRes, int, *apperror.CErr) {
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, http.StatusInternalServerError, err
+		return nil, http.StatusInternalServerError, apperror.NewCErr(errors.New("password can not be hashed"), nil)
 	}
 
 	cred := _authEntities.UsersCredentials{
@@ -71,8 +71,8 @@ func (u *authUse) Register(ctx context.Context, req *_userEntities.UserCreatedRe
 	log.Info("req", req)
 	user, err := u.UsersRepo.CreateUser(ctx, req)
 	if err != nil {
-		status, newErr := apperror.HandleAuthError(err)
-		return nil, status, newErr
+		status, cErr := apperror.HandleAuthError(err)
+		return nil, status, cErr
 	}
 	log.Info("res", user)
 
@@ -84,8 +84,8 @@ func (u *authUse) Register(ctx context.Context, req *_userEntities.UserCreatedRe
 		Username: req.Username,
 	})
 	if err != nil {
-		status, newErr := apperror.HandleAuthError(err)
-		return nil, status, newErr
+		status, cErr := apperror.HandleAuthError(err)
+		return nil, status, cErr
 	}
 
 	res := &dtos.UsersRegisteredRes{

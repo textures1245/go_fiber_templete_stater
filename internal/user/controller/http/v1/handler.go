@@ -34,6 +34,7 @@ func (con userCon) UpdateUserById(c *fiber.Ctx) error {
 			"status":      http.StatusText(http.StatusBadRequest),
 			"status_code": http.StatusBadRequest,
 			"message":     "user_id params is required",
+			"raw_message": "",
 			"result":      nil,
 		})
 	}
@@ -43,7 +44,8 @@ func (con userCon) UpdateUserById(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"status":      http.StatusText(http.StatusBadRequest),
 			"status_code": http.StatusBadRequest,
-			"message":     err.Error(),
+			"raw_message": err.Error(),
+			"message":     "error, invalid user_id params",
 			"result":      nil,
 		})
 	}
@@ -53,7 +55,8 @@ func (con userCon) UpdateUserById(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"status":      http.StatusText(http.StatusBadRequest),
 			"status_code": http.StatusBadRequest,
-			"message":     err.Error(),
+			"message":     "error, invalid request body",
+			"raw_message": err.Error(),
 			"result":      nil,
 		})
 	}
