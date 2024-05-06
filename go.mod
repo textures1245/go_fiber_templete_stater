@@ -3,6 +3,7 @@ module github.com/textures1245/go-template
 go 1.21.6
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/antonfisher/nested-logrus-formatter v1.3.1
 	github.com/blockloop/scan v1.3.0
 	github.com/denisenkom/go-mssqldb v0.12.3
@@ -11,12 +12,13 @@ require (
 	github.com/sima-land/logrus-logstash-hook v0.0.0-20171113125854-e75938162af1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.18.2
+	go.uber.org/mock v0.4.0
 )
 
 require (
-	go.uber.org/mock v0.4.0 // indirect
-	golang.org/x/mod v0.12.0 // indirect
-	golang.org/x/tools v0.13.0 // indirect
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+	github.com/stretchr/testify v1.9.0
 )
 
 require (
@@ -24,11 +26,11 @@ require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
-	github.com/go-sql-driver/mysql v1.8.1 // indirect
+	github.com/go-sql-driver/mysql v1.8.1
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
-	github.com/google/uuid v1.5.0 // indirect
+	github.com/google/uuid v1.5.0
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
 	github.com/jmoiron/sqlx v1.4.0
@@ -58,7 +60,7 @@ require (
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
-	golang.org/x/crypto v0.16.0 // indirect
+	golang.org/x/crypto v0.16.0
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
