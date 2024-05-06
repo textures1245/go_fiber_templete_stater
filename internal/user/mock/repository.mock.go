@@ -71,18 +71,18 @@ func (mr *MockUserRepositoryMockRecorder) DeleteUserById(ctx, userID any) *gomoc
 }
 
 // FindUserAsPassport mocks base method.
-func (m *MockUserRepository) FindUserAsPassport(ctx context.Context, email string) (*entities.UsersPassport, error) {
+func (m *MockUserRepository) FindUserAsPassport(ctx context.Context, username string) (*entities.UsersPassport, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindUserAsPassport", ctx, email)
+	ret := m.ctrl.Call(m, "FindUserAsPassport", ctx, username)
 	ret0, _ := ret[0].(*entities.UsersPassport)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FindUserAsPassport indicates an expected call of FindUserAsPassport.
-func (mr *MockUserRepositoryMockRecorder) FindUserAsPassport(ctx, email any) *gomock.Call {
+func (mr *MockUserRepositoryMockRecorder) FindUserAsPassport(ctx, username any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindUserAsPassport", reflect.TypeOf((*MockUserRepository)(nil).FindUserAsPassport), ctx, email)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindUserAsPassport", reflect.TypeOf((*MockUserRepository)(nil).FindUserAsPassport), ctx, username)
 }
 
 // FindUserByUsernameAndPassword mocks base method.
