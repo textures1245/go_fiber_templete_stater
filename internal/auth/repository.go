@@ -1,10 +1,10 @@
 package auth
 
-import "github.com/textures1245/go-template/internal/auth/dtos"
+import (
+	"github.com/textures1245/go-template/internal/auth/dtos"
+	"github.com/textures1245/go-template/internal/auth/entities"
+)
 
 type AuthRepository interface {
-	SignUsersAccessToken(req *struct {
-		Id       int64
-		Username string
-	}) (*dtos.UserTokenRes, error)
+	SignUsersAccessToken(req *entities.UserSignToken) (*dtos.UserTokenRes, error)
 }

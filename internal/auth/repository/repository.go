@@ -23,10 +23,7 @@ func NewAuthRepository(db *sqlx.DB) auth.AuthRepository {
 	}
 }
 
-func (r *authRepo) SignUsersAccessToken(req *struct {
-	Id       int64
-	Username string
-}) (*dtos.UserTokenRes, error) {
+func (r *authRepo) SignUsersAccessToken(req *entities.UserSignToken) (*dtos.UserTokenRes, error) {
 	claims := entities.UsersClaims{
 		Id:       req.Id,
 		Username: req.Username,
