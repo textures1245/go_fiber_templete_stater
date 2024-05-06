@@ -1,6 +1,7 @@
 package apperror
 
 import (
+	"database/sql"
 	"errors"
 	"net/http"
 
@@ -14,10 +15,17 @@ var (
 	errorTableNotFound        = errors.New("user table not found")
 	errorForeignKeyConstraint = errors.New("cant create or update User: a foreign key constraint fails")
 	errorMySQLConnection      = errors.New("cantConnectToMySQLServer")
+
+	// custom Error
+	ErrorInvalidCredentials = errors.New("Invalid credentials")
 )
 
 func HandleAuthError(err error) (int, *CErr) {
 	var mysqlErr *mysql.MySQLError
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return http.StatusNotFound, NewCErr(errors.New("username not found"), err)
+	}
 
 	if errors.As(err, &mysqlErr) {
 		switch mysqlErr.Number {

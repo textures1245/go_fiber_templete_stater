@@ -11,7 +11,7 @@ type UserRepository interface {
 	FindUserByUsernameAndPassword(ctx context.Context, req *_userEntities.UserLoginReq) (*_userEntities.User, error)
 	CreateUser(ctx context.Context, user *_userEntities.UserCreatedReq) (*int64, error) // Fixed the mixed named and unnamed parameters
 	GetUsers(ctx context.Context) ([]*_userEntities.User, error)
-	FindUserAsPassport(ctx context.Context, email string) (*_authEntities.UsersPassport, error)
+	FindUserAsPassport(ctx context.Context, username string) (*_authEntities.UsersPassport, error)
 	GetUserById(ctx context.Context, userID int64) (*_userEntities.User, error)
 	UpdateUserById(ctx context.Context, userID int64, user *_userEntities.UserUpdateReq) error
 	DeleteUserById(ctx context.Context, userID int64) error

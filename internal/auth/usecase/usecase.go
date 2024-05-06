@@ -39,7 +39,7 @@ func (u *authUse) Login(ctx context.Context, req *_authEntities.UsersCredentials
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		fmt.Println(err.Error())
-		return nil, http.StatusBadRequest, apperror.NewCErr(errors.New("error, password is invalid"), nil)
+		return nil, http.StatusBadRequest, apperror.NewCErr(apperror.ErrorInvalidCredentials, nil)
 	}
 
 	userToken, err := u.AuthRepo.SignUsersAccessToken(&entities.UserSignToken{
