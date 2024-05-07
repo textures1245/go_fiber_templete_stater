@@ -15,6 +15,7 @@ import (
 	userEntities "github.com/textures1245/go-template/internal/user/entities"
 	mock_user "github.com/textures1245/go-template/internal/user/mock"
 	"github.com/textures1245/go-template/pkg/apperror"
+	"github.com/textures1245/go-template/pkg/utils"
 	"go.uber.org/mock/gomock"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -38,18 +39,12 @@ func generatePasswordHash(password string) ([]byte, error) {
 // TODO: Test_usecase_Register
 
 func Test_usecase_Login(t *testing.T) {
-
-	// db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-	// require.NoError(t, err)
-	// defer db.Close()
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	var (
-		// conn = sqlx.NewDb(db, "sqlmock")
-		// userRepo       = userRepo.NewUserRepository(conn)
 		username       = "username_test"
-		password       = "password_test"
+		password       = "ss"
 		userId   int64 = 1
 	)
 
@@ -71,14 +66,51 @@ func Test_usecase_Login(t *testing.T) {
 	}
 
 	t.Run("login_positive_case", func(t *testing.T) {
-		// mock.
-		// 	ExpectExec(repository_query.InsertUser).
-		// 	WithArgs(userCred.Name, userCred.Username, userCred.Password, userCred.Email, userCred.PhoneNumber, userCred.IdCard).
-		// 	WillReturnResult(sqlmock.NewResult(userId, 1))
 
-		// userID, error := userRepo.CreateUser(context.Background(), userCred)
-		// assert.NoError(t, error)
-		// assert.NotEmpty(t, userID)
+		errOnValidate := utils.SchemaValidator(userCred)
+		var (
+			cRawErrValidate error
+		)
+
+		if errOnValidate != nil {
+			cRawErrValidate = errOnValidate.RawError
+		}
+
+		require.NoError(t, cRawErrValidate)
+
+		userMockRepo.EXPECT().FindUserAsPassport(ctx, userCred.Username).Return(userPassport, nil)
+		usrPassport, pError := userMockRepo.FindUserAsPassport(ctx, userCred.Username)
+		require.NoError(t, pError)
+		require.NotNil(t, usrPassport)
+
+		aMockUse.EXPECT().Login(ctx, userCred).Return(&dtos.UserTokenRes{
+			TokenType: "Authorization",
+		}, http.StatusOK, nil)
+		userToken, status, err := aMockUse.Login(ctx, userCred)
+		if err != nil {
+			require.NoError(t, err.RawError)
+			require.NoError(t, err.CError)
+		}
+		require.Equal(t, status, http.StatusOK)
+		require.NotNil(t, userToken)
+	})
+
+	t.Run("login_negative_invalid_req_schema", func(t *testing.T) {
+
+		invalidUserCred := *userCred
+		invalidUserCred.Password = ""
+		invalidUserCred.Username = ""
+
+		errOnValidate := utils.SchemaValidator(&invalidUserCred)
+		var (
+			cRawErrValidate error
+		)
+
+		if errOnValidate != nil {
+			cRawErrValidate = errOnValidate.RawError
+		}
+
+		require.Error(t, cRawErrValidate)
 
 		userMockRepo.EXPECT().FindUserAsPassport(ctx, userCred.Username).Return(userPassport, nil)
 		usrPassport, pError := userMockRepo.FindUserAsPassport(ctx, userCred.Username)
@@ -98,14 +130,14 @@ func Test_usecase_Login(t *testing.T) {
 	})
 
 	t.Run("login_negative_password_invalid", func(t *testing.T) {
-		// mock.
-		// 	ExpectExec(repository_query.InsertUser).
-		// 	WithArgs(userCred.Name, userCred.Username, userCred.Password, userCred.Email, userCred.PhoneNumber, userCred.IdCard).
-		// 	WillReturnResult(sqlmock.NewResult(userId, 1))
-
-		// userID, error := userRepo.CreateUser(context.Background(), userCred)
-		// assert.NoError(t, error)
-		// assert.NotEmpty(t, userID)
+		errOnValidate := utils.SchemaValidator(userCred)
+		var (
+			cRawErrValidate error
+		)
+		if errOnValidate != nil {
+			cRawErrValidate = errOnValidate.RawError
+		}
+		require.NoError(t, cRawErrValidate)
 
 		userMockRepo.EXPECT().FindUserAsPassport(ctx, userCred.Username).Return(userPassport, nil)
 		usrPassport, pError := userMockRepo.FindUserAsPassport(ctx, userCred.Username)
@@ -133,14 +165,14 @@ func Test_usecase_Login(t *testing.T) {
 	})
 
 	t.Run("login_negative_failed_query_username", func(t *testing.T) {
-		// mock.
-		// 	ExpectExec(repository_query.InsertUser).
-		// 	WithArgs(userCred.Name, userCred.Username, userCred.Password, userCred.Email, userCred.PhoneNumber, userCred.IdCard).
-		// 	WillReturnResult(sqlmock.NewResult(userId, 1))
-
-		// userID, error := userRepo.CreateUser(context.Background(), userCred)
-		// assert.NoError(t, error)
-		// assert.NotEmpty(t, userID)
+		errOnValidate := utils.SchemaValidator(userCred)
+		var (
+			cRawErrValidate error
+		)
+		if errOnValidate != nil {
+			cRawErrValidate = errOnValidate.RawError
+		}
+		require.NoError(t, cRawErrValidate)
 
 		userMockRepo.EXPECT().FindUserAsPassport(ctx, userCred.Username).Return(&entities.UsersPassport{}, sql.ErrNoRows)
 		usrPassport, pError := userMockRepo.FindUserAsPassport(ctx, userCred.Username)
@@ -174,15 +206,59 @@ func Test_usecase_Register(t *testing.T) {
 	aMockUse := mock_auth.NewMockAuthUsecase(ctrl)
 
 	userCreated := &userEntities.UserCreatedReq{
-		Name:        "test",
+		Name:        "test12345",
 		Username:    username,
 		Password:    password,
 		Email:       "test@gmail.com",
-		PhoneNumber: "08123456789",
-		IdCard:      "1234567890",
+		PhoneNumber: "0654209589",
+		IdCard:      "12345678901234",
 	}
 
 	t.Run("register_positive_case", func(t *testing.T) {
+		errOnValidate := utils.SchemaValidator(userCreated)
+		var (
+			cRawErrValidate error
+		)
+		if errOnValidate != nil {
+			cRawErrValidate = errOnValidate.RawError
+		}
+		require.NoError(t, cRawErrValidate)
+
+		userMockRepo.EXPECT().CreateUser(ctx, userCreated).Return(&userId, nil)
+		usrId, err := userMockRepo.CreateUser(ctx, userCreated)
+		require.NoError(t, err)
+		require.NotNil(t, usrId)
+
+		aMockUse.EXPECT().Register(ctx, userCreated).Return(&dtos.UsersRegisteredRes{
+			AccessToken: "Authorization",
+		}, http.StatusOK, nil)
+		userToken, status, cErr := aMockUse.Register(ctx, userCreated)
+
+		var rawError error
+		if cErr != nil {
+			rawError = cErr.RawError
+		}
+		require.NoError(t, rawError)
+		require.Equal(t, status, http.StatusOK)
+		require.NotNil(t, userToken)
+	})
+
+	t.Run("register_negative_invalid_req_schema", func(t *testing.T) {
+		invalidUserCreated := *userCreated
+		invalidUserCreated.Email = "notEmail"
+		invalidUserCreated.Password = "bad_pw"
+		invalidUserCreated.PhoneNumber = "s"
+		invalidUserCreated.IdCard = "s"
+
+		errOnValidate := utils.SchemaValidator(&invalidUserCreated)
+		var (
+			cRawErrValidate error
+		)
+		if errOnValidate != nil {
+			cRawErrValidate = errOnValidate.RawError
+		}
+		require.Error(t, cRawErrValidate)
+
 		userMockRepo.EXPECT().CreateUser(ctx, userCreated).Return(&userId, nil)
 		usrId, err := userMockRepo.CreateUser(ctx, userCreated)
 		require.NoError(t, err)
