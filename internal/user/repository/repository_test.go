@@ -194,3 +194,39 @@ func Test_repo_GetUserById(t *testing.T) {
 	})
 
 }
+
+func Test_repo_DeleteUserById(t *testing.T) {
+	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	require.NoError(t, err)
+	defer db.Close()
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	var (
+		conn     = sqlx.NewDb(db, "sqlmock")
+		userRepo = repository.NewUserRepository(conn)
+	)
+
+	userId := int64(1)
+
+	t.Run("DeleteUserById_positive_case", func(t *testing.T) {
+
+		mock.
+			ExpectExec(repository_query.DeleteUserById).
+			WithArgs(userId).
+			WillReturnResult(sqlmock.NewResult(userId, 1))
+
+		err := userRepo.DeleteUserById(context.Background(), userId)
+		assert.NoError(t, err)
+
+		mock.
+			ExpectQuery(repository_query.FindUserById).
+			WithArgs(userId).
+			WillReturnError(sql.ErrNoRows)
+
+		usr, err := userRepo.GetUserById(context.Background(), userId)
+		assert.EqualError(t, err, sql.ErrNoRows.Error())
+		assert.Nil(t, usr)
+	})
+
+}
