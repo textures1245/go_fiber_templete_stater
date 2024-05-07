@@ -15,6 +15,7 @@ import (
 
 	dtos "github.com/textures1245/go-template/internal/user/dtos"
 	entities "github.com/textures1245/go-template/internal/user/entities"
+	apperror "github.com/textures1245/go-template/pkg/apperror"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -42,12 +43,12 @@ func (m *MockUserUsecase) EXPECT() *MockUserUsecaseMockRecorder {
 }
 
 // OnFetchUserById mocks base method.
-func (m *MockUserUsecase) OnFetchUserById(ctx context.Context, userId int64) (*dtos.UserDetailRespond, int, error) {
+func (m *MockUserUsecase) OnFetchUserById(ctx context.Context, userId int64) (*dtos.UserDetailRespond, int, *apperror.CErr) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "OnFetchUserById", ctx, userId)
 	ret0, _ := ret[0].(*dtos.UserDetailRespond)
 	ret1, _ := ret[1].(int)
-	ret2, _ := ret[2].(error)
+	ret2, _ := ret[2].(*apperror.CErr)
 	return ret0, ret1, ret2
 }
 
@@ -58,12 +59,12 @@ func (mr *MockUserUsecaseMockRecorder) OnFetchUserById(ctx, userId any) *gomock.
 }
 
 // OnFetchUsers mocks base method.
-func (m *MockUserUsecase) OnFetchUsers(ctx context.Context) ([]*dtos.UserDetailRespond, int, error) {
+func (m *MockUserUsecase) OnFetchUsers(ctx context.Context) ([]*dtos.UserDetailRespond, int, *apperror.CErr) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "OnFetchUsers", ctx)
 	ret0, _ := ret[0].([]*dtos.UserDetailRespond)
 	ret1, _ := ret[1].(int)
-	ret2, _ := ret[2].(error)
+	ret2, _ := ret[2].(*apperror.CErr)
 	return ret0, ret1, ret2
 }
 
@@ -74,11 +75,11 @@ func (mr *MockUserUsecaseMockRecorder) OnFetchUsers(ctx any) *gomock.Call {
 }
 
 // OnUpdateUserById mocks base method.
-func (m *MockUserUsecase) OnUpdateUserById(ctx context.Context, userId int64, req *entities.UserUpdateReq) (int, error) {
+func (m *MockUserUsecase) OnUpdateUserById(ctx context.Context, userId int64, req *entities.UserUpdateReq) (int, *apperror.CErr) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "OnUpdateUserById", ctx, userId, req)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
+	ret1, _ := ret[1].(*apperror.CErr)
 	return ret0, ret1
 }
 
@@ -89,12 +90,12 @@ func (mr *MockUserUsecaseMockRecorder) OnUpdateUserById(ctx, userId, req any) *g
 }
 
 // OnUserLogin mocks base method.
-func (m *MockUserUsecase) OnUserLogin(ctx context.Context, req *entities.UserLoginReq) (*dtos.UserLoginResponse, int, error) {
+func (m *MockUserUsecase) OnUserLogin(ctx context.Context, req *entities.UserLoginReq) (*dtos.UserLoginResponse, int, *apperror.CErr) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "OnUserLogin", ctx, req)
 	ret0, _ := ret[0].(*dtos.UserLoginResponse)
 	ret1, _ := ret[1].(int)
-	ret2, _ := ret[2].(error)
+	ret2, _ := ret[2].(*apperror.CErr)
 	return ret0, ret1, ret2
 }
 
@@ -105,11 +106,11 @@ func (mr *MockUserUsecaseMockRecorder) OnUserLogin(ctx, req any) *gomock.Call {
 }
 
 // UserDeleted mocks base method.
-func (m *MockUserUsecase) UserDeleted(ctx context.Context, userId int64) (int, error) {
+func (m *MockUserUsecase) UserDeleted(ctx context.Context, userId int64) (int, *apperror.CErr) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "UserDeleted", ctx, userId)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
+	ret1, _ := ret[1].(*apperror.CErr)
 	return ret0, ret1
 }
 
