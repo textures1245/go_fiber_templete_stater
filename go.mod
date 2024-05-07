@@ -16,6 +16,12 @@ require (
 )
 
 require (
+	github.com/go-playground/locales v0.14.1 // indirect
+	github.com/go-playground/universal-translator v0.18.1 // indirect
+	github.com/leodido/go-urn v1.4.0 // indirect
+)
+
+require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/stretchr/testify v1.9.0
@@ -26,6 +32,7 @@ require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/fastly/go-utils v0.0.0-20180712184237-d95a45783239 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe // indirect
