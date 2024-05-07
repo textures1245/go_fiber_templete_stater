@@ -9,7 +9,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/textures1245/go-template/internal/user"
 	"github.com/textures1245/go-template/internal/user/entities"
-	"github.com/textures1245/go-template/pkg/apperror"
 )
 
 type userCon struct {
@@ -51,19 +50,18 @@ func (con userCon) UpdateUserById(c *fiber.Ctx) error {
 	}
 
 	var req = new(entities.UserUpdateReq)
-	if err := c.BodyParser(req); err != nil {
+	if cE := c.BodyParser(req); cE != nil {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"status":      http.StatusText(http.StatusBadRequest),
 			"status_code": http.StatusBadRequest,
 			"message":     "error, invalid request body",
-			"raw_message": err.Error(),
+			"raw_message": cE.Error(),
 			"result":      nil,
 		})
 	}
 
-	status, err := con.userUse.OnUpdateUserById(ctx, userId, req)
-	if err != nil {
-		status, cE := apperror.CustomSqlExecuteHandler("User", err)
+	status, cE := con.userUse.OnUpdateUserById(ctx, userId, req)
+	if cE != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      http.StatusText(status),
 			"status_code": status,
@@ -90,13 +88,14 @@ func (con *userCon) FetchUsers(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	users, status, err := con.userUse.OnFetchUsers(ctx)
+	users, status, cE := con.userUse.OnFetchUsers(ctx)
 
-	if err != nil {
+	if cE != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      http.StatusText(status),
 			"status_code": status,
-			"message":     err.Error(),
+			"message":     cE.CError.Error(),
+			"raw_message": cE.RawError.Error(),
 			"result":      nil,
 		})
 	}
@@ -122,6 +121,7 @@ func (con *userCon) FetchUserById(c *fiber.Ctx) error {
 			"status":      http.StatusText(http.StatusBadRequest),
 			"status_code": http.StatusBadRequest,
 			"message":     "user_id params is required",
+			"raw_message": "",
 			"result":      nil,
 		})
 	}
@@ -131,14 +131,14 @@ func (con *userCon) FetchUserById(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
 			"status":      http.StatusText(http.StatusBadRequest),
 			"status_code": http.StatusBadRequest,
-			"message":     err.Error(),
+			"message":     "",
+			"raw_message": err.Error(),
 			"result":      nil,
 		})
 	}
 
-	users, status, err := con.userUse.OnFetchUserById(ctx, userId)
-	if err != nil {
-		status, cE := apperror.CustomSqlExecuteHandler("User", err)
+	users, status, cE := con.userUse.OnFetchUserById(ctx, userId)
+	if cE != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      http.StatusText(status),
 			"status_code": status,
@@ -184,9 +184,8 @@ func (con *userCon) DeleteUserById(c *fiber.Ctx) error {
 		})
 	}
 
-	status, err := con.userUse.UserDeleted(ctx, userId)
-	if err != nil {
-		status, cE := apperror.CustomSqlExecuteHandler("User", err)
+	status, cE := con.userUse.UserDeleted(ctx, userId)
+	if cE != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      http.StatusText(status),
 			"status_code": status,
