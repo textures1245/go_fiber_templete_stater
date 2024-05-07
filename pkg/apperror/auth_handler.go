@@ -9,12 +9,12 @@ import (
 )
 
 var (
-	errorUnauthorized         = errors.New("dbUnauthorized")
-	errorDatabaseNotFound     = errors.New("databaseNotFound")
-	errorDuplicateEntry       = errors.New("username already exists")
-	errorTableNotFound        = errors.New("user table not found")
-	errorForeignKeyConstraint = errors.New("cant create or update User: a foreign key constraint fails")
-	errorMySQLConnection      = errors.New("cantConnectToMySQLServer")
+	ErrorUnauthorized         = errors.New("dbUnauthorized")
+	ErrorDatabaseNotFound     = errors.New("databaseNotFound")
+	ErrorDuplicateEntry       = errors.New("username already exists")
+	ErrorTableNotFound        = errors.New("user table not found")
+	ErrorForeignKeyConstraint = errors.New("cant create or update User: a foreign key constraint fails")
+	ErrorMySQLConnection      = errors.New("cantConnectToMySQLServer")
 
 	// custom Error
 	ErrorInvalidCredentials = errors.New("Invalid credentials")
@@ -30,17 +30,17 @@ func HandleAuthError(err error) (int, *CErr) {
 	if errors.As(err, &mysqlErr) {
 		switch mysqlErr.Number {
 		case 1045:
-			return http.StatusUnauthorized, NewCErr(errorUnauthorized, err)
+			return http.StatusUnauthorized, NewCErr(ErrorUnauthorized, err)
 		case 1049:
-			return http.StatusNotFound, NewCErr(errorDatabaseNotFound, err)
+			return http.StatusNotFound, NewCErr(ErrorDatabaseNotFound, err)
 		case 1062:
-			return http.StatusConflict, NewCErr(errorDuplicateEntry, err)
+			return http.StatusConflict, NewCErr(ErrorDuplicateEntry, err)
 		case 1146:
-			return http.StatusNotFound, NewCErr(errorTableNotFound, err)
+			return http.StatusNotFound, NewCErr(ErrorTableNotFound, err)
 		case 1217, 1452:
-			return http.StatusConflict, NewCErr(errorForeignKeyConstraint, err)
+			return http.StatusConflict, NewCErr(ErrorForeignKeyConstraint, err)
 		case 2002:
-			return http.StatusServiceUnavailable, NewCErr(errorMySQLConnection, err)
+			return http.StatusServiceUnavailable, NewCErr(ErrorMySQLConnection, err)
 		}
 	}
 	return http.StatusInternalServerError, NewCErr(errors.New("UnknownCustomErrorCanNotBeMade"), err)
