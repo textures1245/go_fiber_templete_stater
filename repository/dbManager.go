@@ -32,7 +32,6 @@ func init() {
 	user = viper.GetString("DB_USER")
 	password = viper.GetString("DB_PASS")
 	database = viper.GetString("DB_INST")
-	// connString := fmt.Sprintf("server=%s;user id=%s;password=%s;port=%d;database=%s", server, user, password, port, database)
 	connString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", user, password, server, port, database)
 	log.Debug(connString)
 

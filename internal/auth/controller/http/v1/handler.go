@@ -9,6 +9,7 @@ import (
 	"github.com/textures1245/go-template/internal/auth"
 	"github.com/textures1245/go-template/internal/auth/entities"
 	_userEntities "github.com/textures1245/go-template/internal/user/entities"
+	"github.com/textures1245/go-template/pkg/utils"
 )
 
 type authConn struct {
@@ -29,6 +30,17 @@ func (a *authConn) Login(c *fiber.Ctx) error {
 			"status_code": http.StatusBadRequest,
 			"message":     "error, invalid request body",
 			"raw_message": err.Error(),
+			"result":      nil,
+		})
+	}
+
+	errOnValidate := utils.SchemaValidator(req)
+	if errOnValidate != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"status":      http.StatusText(http.StatusBadRequest),
+			"status_code": http.StatusBadRequest,
+			"message":     "error, invalid validated on schema body",
+			"raw_message": errOnValidate.RawError.Error(),
 			"result":      nil,
 		})
 	}
@@ -66,6 +78,17 @@ func (a *authConn) Register(c *fiber.Ctx) error {
 			"status_code": http.StatusBadRequest,
 			"message":     "error, invalid request body",
 			"raw_message": err.Error(),
+			"result":      nil,
+		})
+	}
+
+	errOnValidate := utils.SchemaValidator(req)
+	if errOnValidate != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"status":      http.StatusText(http.StatusBadRequest),
+			"status_code": http.StatusBadRequest,
+			"message":     "error, invalid validated on schema body",
+			"raw_message": errOnValidate.RawError.Error(),
 			"result":      nil,
 		})
 	}

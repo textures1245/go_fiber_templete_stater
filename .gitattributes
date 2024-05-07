@@ -1,0 +1,4 @@
+internal/auth/mock/repository.mock.go linguist-generated=true
+internal/auth/mock/usecase.mock.go linguist-generated=true
+internal/user/mock/usecase.mock.go linguist-generated=true
+internal/user/mock/repository.mock.go linguist-generated=true
