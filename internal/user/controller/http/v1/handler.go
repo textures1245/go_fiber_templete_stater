@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/textures1245/go-template/internal/user"
 	"github.com/textures1245/go-template/internal/user/entities"
+	"github.com/textures1245/go-template/pkg/utils"
 )
 
 type userCon struct {
@@ -22,6 +23,29 @@ func NewUserController(userUse user.UserUsecase) *userCon {
 }
 
 func (con userCon) UpdateUserById(c *fiber.Ctx) error {
+
+	var req = new(entities.UserUpdateReq)
+	if cE := c.BodyParser(req); cE != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"status":      http.StatusText(http.StatusBadRequest),
+			"status_code": http.StatusBadRequest,
+			"message":     "error, invalid request body",
+			"raw_message": cE.Error(),
+			"result":      nil,
+		})
+	}
+
+	errOnValidate := utils.SchemaValidator(req)
+	if errOnValidate != nil {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"status":      http.StatusText(http.StatusBadRequest),
+			"status_code": http.StatusBadRequest,
+			"message":     "error, invalid validated on schema body",
+			"raw_message": errOnValidate.RawError.Error(),
+			"result":      nil,
+		})
+	}
+
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
 		reqP        = c.Params("user_id")
@@ -45,17 +69,6 @@ func (con userCon) UpdateUserById(c *fiber.Ctx) error {
 			"status_code": http.StatusBadRequest,
 			"raw_message": err.Error(),
 			"message":     "error, invalid user_id params",
-			"result":      nil,
-		})
-	}
-
-	var req = new(entities.UserUpdateReq)
-	if cE := c.BodyParser(req); cE != nil {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
-			"status":      http.StatusText(http.StatusBadRequest),
-			"status_code": http.StatusBadRequest,
-			"message":     "error, invalid request body",
-			"raw_message": cE.Error(),
 			"result":      nil,
 		})
 	}
