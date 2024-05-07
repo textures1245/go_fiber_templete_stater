@@ -9,7 +9,6 @@ import (
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/textures1245/go-template/internal/auth"
 	"github.com/textures1245/go-template/internal/auth/dtos"
-	"github.com/textures1245/go-template/internal/auth/entities"
 	_authEntities "github.com/textures1245/go-template/internal/auth/entities"
 	"github.com/textures1245/go-template/internal/user"
 	_userEntities "github.com/textures1245/go-template/internal/user/entities"
@@ -42,7 +41,7 @@ func (u *authUse) Login(ctx context.Context, req *_authEntities.UsersCredentials
 		return nil, http.StatusBadRequest, apperror.NewCErr(apperror.ErrorInvalidCredentials, nil)
 	}
 
-	userToken, err := u.AuthRepo.SignUsersAccessToken(&entities.UserSignToken{
+	userToken, err := u.AuthRepo.SignUsersAccessToken(&_authEntities.UserSignToken{
 		Id:       user.Id,
 		Username: req.Username,
 	})
@@ -74,7 +73,7 @@ func (u *authUse) Register(ctx context.Context, req *_userEntities.UserCreatedRe
 	}
 	log.Info("res", user)
 
-	userToken, err := u.AuthRepo.SignUsersAccessToken(&entities.UserSignToken{
+	userToken, err := u.AuthRepo.SignUsersAccessToken(&_authEntities.UserSignToken{
 		Id:       *user,
 		Username: req.Username,
 	})
