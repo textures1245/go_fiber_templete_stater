@@ -42,23 +42,23 @@ func (f *File) Base64toPng() (string, error) {
 		reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(fileData))
 		m, _, err := image.Decode(reader)
 		if err != nil {
-			log.Fatal(err)
+			return "", err
 		}
 		// bounds := m.Bounds()
 		// fmt.Println(bounds, formatString)
 
 		osFile, errOnOpenFIle := os.OpenFile(pngFilename, os.O_WRONLY|os.O_CREATE, 0777)
 		if errOnOpenFIle != nil {
-			log.Fatal(errOnOpenFIle)
+			return "", err
 		}
 		err = png.Encode(osFile, m)
 		if err != nil {
-			log.Fatal(err)
+			return "", err
 		}
 		buffer := new(bytes.Buffer)
 		errWhileEncoding := png.Encode(buffer, m) // img is your image.Image
 		if errWhileEncoding != nil {
-			log.Fatal(errWhileEncoding)
+			return "", err
 		}
 		srcImg := fmt.Sprintf("data:image/png;base64,%s", base64.StdEncoding.EncodeToString(buffer.Bytes()))
 		log.Info("Create new PNG file name: ", pngFilename, "as the output")
@@ -95,19 +95,19 @@ func (f *File) Base64toJpg() (string, error) {
 		reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(fileData))
 		m, formatString, err := image.Decode(reader)
 		if err != nil {
-			log.Fatal(err)
+			return "", err
 		}
 		bounds := m.Bounds()
 		fmt.Println("base64toJpg", bounds, formatString)
 
 		osFile, err := os.OpenFile(jpgFilename, os.O_WRONLY|os.O_CREATE, 0777)
 		if err != nil {
-			log.Fatal(err)
+			return "", err
 		}
 
 		err = jpeg.Encode(osFile, m, &jpeg.Options{Quality: 75})
 		if err != nil {
-			log.Fatal(err)
+			return "", err
 		}
 
 		buffer := new(bytes.Buffer)
@@ -130,4 +130,46 @@ func (f *File) Base64toJpg() (string, error) {
 	log.Info("Reusing exist JPG file name: ", jpgFilename, "as the output")
 
 	return srcImg, nil
+}
+
+func (f *File) Base64toFile() (string, error) {
+	if len(f.FileData) == 0 || f.FileType != "PDF" {
+		return "", errors.New("Invalid file data or file type, expected PDF file type but got " + f.FileType)
+	}
+
+	// encode blob to string
+	fileData := base64.StdEncoding.EncodeToString(f.FileData)
+	hasher := sha256.New()
+	hasher.Write([]byte(fileData))
+	hash := hex.EncodeToString(hasher.Sum(nil))
+
+	fileName := "public/file/" + hash + ".pdf"
+	if _, err := os.Stat(fileName); os.IsNotExist(err) {
+
+		data, err := base64.StdEncoding.DecodeString(fileData)
+		if err != nil {
+			return "", err
+		}
+
+		err = os.WriteFile(fileName, data, 0644)
+		if err != nil {
+			return "", err
+		}
+
+		srcFile := fmt.Sprintf("data:file/%s;base64,%s", strings.ToLower(f.FileType), base64.StdEncoding.EncodeToString(data))
+		log.Info("Reusing exist ", f.FileType, " file name: ", fileName, "as the output")
+
+		return srcFile, nil
+	}
+
+	data, err := os.ReadFile(fileName)
+	if err != nil {
+		return "", err
+	}
+
+	srcFile := fmt.Sprintf("data:file/%s;base64,%s", strings.ToLower(f.FileType), base64.StdEncoding.EncodeToString(data))
+	log.Info("Reusing exist ", f.FileType, " file name: ", fileName, "as the output")
+
+	return srcFile, nil
+
 }
