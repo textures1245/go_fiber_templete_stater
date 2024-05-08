@@ -56,6 +56,13 @@ func (u *fileUsecase) GetSourceFiles(ctx context.Context) ([]*dtos.FileSourceDat
 				return nil, status, cErr
 			}
 			srcFile = src
+		case "PDF":
+			src, err := file.Base64toFile()
+			if err != nil {
+				status, cErr := apperror.CustomSqlExecuteHandler("File", err)
+				return nil, status, cErr
+			}
+			srcFile = src
 		default:
 			return nil, http.StatusBadRequest, apperror.NewCErr(errors.New("Only except for PNG and JPG for now"), errors.ErrUnsupported)
 		}
