@@ -10,6 +10,7 @@ import (
 	"github.com/textures1245/go-template/service"
 
 	authV1 "github.com/textures1245/go-template/internal/auth/controller/http/v1"
+	fileV1 "github.com/textures1245/go-template/internal/file/controller/http/v1"
 	userV1 "github.com/textures1245/go-template/internal/user/controller/http/v1"
 
 	// "github.com/textures1245/go-template/config"
@@ -52,6 +53,7 @@ func SetupRoutes(app *fiber.App) {
 
 	userV1.UseUserRoute(db, app)
 	authV1.UseAuthRoute(db, app)
+	fileV1.UseFileRoute(db, app)
 
 	callback := app.Group("/callback", func(c *fiber.Ctx) error {
 		log.Infof("callback : %v", c.Request().URI().String())
