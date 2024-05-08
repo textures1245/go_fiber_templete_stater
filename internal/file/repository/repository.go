@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"encoding/base64"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/textures1245/go-template/internal/file"
@@ -35,9 +36,15 @@ func (r *fileRepo) GetFiles(ctx context.Context) ([]*entities.File, error) {
 }
 
 func (r *fileRepo) CreateFile(ctx context.Context, file *entities.FileUploaderReq) error {
+	b64, err := base64.StdEncoding.DecodeString(file.FileData)
+	if err != nil {
+		log.Info(err)
+		return err
+	}
+
 	args := utils.Array{
 		file.FileName,
-		file.FileData,
+		b64,
 		file.FileType,
 	}
 
