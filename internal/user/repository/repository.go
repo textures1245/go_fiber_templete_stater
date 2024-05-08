@@ -135,21 +135,29 @@ func (r *userRepo) UpdateUserById(ctx context.Context, userID int64, user *entit
 
 	log.Info(args)
 
-	_, err := r.db.ExecContext(ctx, repository_query.UpdateUserById, args...)
+	res, err := r.db.ExecContext(ctx, repository_query.UpdateUserById, args...)
 	if err != nil {
 		log.Error(err)
 		return err
+	}
+	if affected, _ := res.RowsAffected(); affected == 0 {
+		return sql.ErrNoRows
 	}
 
 	return nil
 }
 
 func (r *userRepo) DeleteUserById(ctx context.Context, userID int64) error {
-	_, err := r.db.ExecContext(ctx, repository_query.DeleteUserById, userID)
+	res, err := r.db.ExecContext(ctx, repository_query.DeleteUserById, userID)
 	if err != nil {
 		log.Error(err)
 		return err
 	}
+	if affected, _ := res.RowsAffected(); affected == 0 {
+		return sql.ErrNoRows
+	}
 
 	return nil
 }
+
+// TODO: Checking row affect for the update and delete
