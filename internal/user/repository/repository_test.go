@@ -124,6 +124,25 @@ func Test_repo_UpdateUserById(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
+	t.Run("UpdateUserById_negative_user_cant_be_find_to_update", func(t *testing.T) {
+		updUser := &entities.UserUpdateReq{
+			Name:        "test",
+			Email:       "update_test@gmail.com",
+			PhoneNumber: "12312edasda",
+			IdCard:      "12345s67890",
+		}
+
+		invalidId := int64(-1)
+
+		mock.
+			ExpectExec(repository_query.UpdateUserById).
+			WithArgs(updUser.Name, updUser.Email, updUser.IdCard, updUser.PhoneNumber, invalidId).
+			WillReturnError(sql.ErrNoRows)
+
+		err := userRepo.UpdateUserById(context.Background(), invalidId, updUser)
+		assert.EqualError(t, err, sql.ErrNoRows.Error())
+	})
+
 }
 
 func Test_repo_GetUserById(t *testing.T) {
@@ -227,6 +246,18 @@ func Test_repo_DeleteUserById(t *testing.T) {
 		usr, err := userRepo.GetUserById(context.Background(), userId)
 		assert.EqualError(t, err, sql.ErrNoRows.Error())
 		assert.Nil(t, usr)
+	})
+
+	t.Run("DeleteUserById_negative_user_cant_be_find_to_delete", func(t *testing.T) {
+		invalidId := int64(-1)
+
+		mock.
+			ExpectExec(repository_query.DeleteUserById).
+			WithArgs(invalidId).
+			WillReturnError(sql.ErrNoRows)
+
+		err := userRepo.DeleteUserById(context.Background(), invalidId)
+		assert.EqualError(t, err, sql.ErrNoRows.Error())
 	})
 
 }
