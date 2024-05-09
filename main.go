@@ -22,6 +22,7 @@ func main() {
 	log.Info("-= Start Simple Service =-")
 	router.SetupRoutes(app)
 
+	app.Static("/public/image", "./public/image")
 	app.Listen(":" + viper.GetString("SERVER_PORT"))
 
 }
