@@ -13,6 +13,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 )
 
@@ -25,10 +26,10 @@ type File struct {
 	UpdatedAt string `db:"updated_at"`
 }
 
-func (f *File) Base64toPng() (string, error) {
+func (f *File) Base64toPng(c *fiber.Ctx) (*string, *string, error) {
 
 	if len(f.FileData) == 0 || f.FileType != "PNG" {
-		return "", errors.New("Invalid file data or file type, expected PNG file type but got " + f.FileType)
+		return nil, nil, errors.New("Invalid file data or file type, expected PNG file type but got " + f.FileType)
 	}
 
 	fileData := base64.StdEncoding.EncodeToString(f.FileData)
@@ -42,46 +43,48 @@ func (f *File) Base64toPng() (string, error) {
 		reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(fileData))
 		m, _, err := image.Decode(reader)
 		if err != nil {
-			return "", err
+			return nil, nil, err
 		}
 		// bounds := m.Bounds()
 		// fmt.Println(bounds, formatString)
 
 		osFile, errOnOpenFIle := os.OpenFile(pngFilename, os.O_WRONLY|os.O_CREATE, 0777)
 		if errOnOpenFIle != nil {
-			return "", err
+			return nil, nil, err
 		}
 		err = png.Encode(osFile, m)
 		if err != nil {
-			return "", err
+			return nil, nil, err
 		}
 		buffer := new(bytes.Buffer)
 		errWhileEncoding := png.Encode(buffer, m) // img is your image.Image
 		if errWhileEncoding != nil {
-			return "", err
+			return nil, nil, err
 		}
-		srcImg := fmt.Sprintf("data:image/png;base64,%s", base64.StdEncoding.EncodeToString(buffer.Bytes()))
+		base64url := fmt.Sprintf("data:image/png;base64,%s", base64.StdEncoding.EncodeToString(buffer.Bytes()))
+		filePathData := fmt.Sprintf("%s/%s", c.Hostname(), pngFilename)
 		log.Info("Create new PNG file name: ", pngFilename, "as the output")
 
-		return srcImg, nil
+		return &base64url, &filePathData, nil
 	}
 
 	data, err := os.ReadFile(pngFilename)
 	if err != nil {
-		return "", err
+		return nil, nil, err
 	}
 
-	srcImg := "data:image/png;base64," + base64.StdEncoding.EncodeToString(data)
+	base64url := "data:image/png;base64," + base64.StdEncoding.EncodeToString(data)
+	filePathData := fmt.Sprintf("%s/%s", c.Hostname(), pngFilename)
 	log.Info("Reusing exist PNG file name: ", pngFilename, "as the output")
 
-	return srcImg, nil
+	return &base64url, &filePathData, nil
 
 }
 
-func (f *File) Base64toJpg() (string, error) {
+func (f *File) Base64toJpg(c *fiber.Ctx) (*string, *string, error) {
 
 	if len(f.FileData) == 0 || f.FileType != "JPG" {
-		return "", errors.New("Invalid file data or file type, expected PNG file type but got " + f.FileType)
+		return nil, nil, errors.New("Invalid file data or file type, expected PNG file type but got " + f.FileType)
 	}
 
 	fileData := base64.StdEncoding.EncodeToString(f.FileData)
@@ -95,19 +98,19 @@ func (f *File) Base64toJpg() (string, error) {
 		reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(fileData))
 		m, formatString, err := image.Decode(reader)
 		if err != nil {
-			return "", err
+			return nil, nil, err
 		}
 		bounds := m.Bounds()
 		fmt.Println("base64toJpg", bounds, formatString)
 
 		osFile, err := os.OpenFile(jpgFilename, os.O_WRONLY|os.O_CREATE, 0777)
 		if err != nil {
-			return "", err
+			return nil, nil, err
 		}
 
 		err = jpeg.Encode(osFile, m, &jpeg.Options{Quality: 75})
 		if err != nil {
-			return "", err
+			return nil, nil, err
 		}
 
 		buffer := new(bytes.Buffer)
@@ -115,26 +118,30 @@ func (f *File) Base64toJpg() (string, error) {
 		if errWhileEncoding != nil {
 			log.Fatal(errWhileEncoding)
 		}
-		srcImg := fmt.Sprintf("data:image/jpeg;base64,%s", base64.StdEncoding.EncodeToString(buffer.Bytes()))
+		base64url := fmt.Sprintf("data:image/jpeg;base64,%s", base64.StdEncoding.EncodeToString(buffer.Bytes()))
+		filePathData := fmt.Sprintf("%s/%s", c.Hostname(), jpgFilename)
 		log.Info("Create new JPG file name: ", jpgFilename, "as the output")
 
-		return srcImg, nil
+		return &base64url, &filePathData, nil
 	}
 
 	data, err := os.ReadFile(jpgFilename)
+
 	if err != nil {
-		return "", err
+		return nil, nil, err
 	}
 
-	srcImg := "data:image/jpeg;base64," + base64.StdEncoding.EncodeToString(data)
+	base64url := "data:image/jpeg;base64," + base64.StdEncoding.EncodeToString(data)
+	filePathData := fmt.Sprintf("%s/%s", c.Hostname(), jpgFilename)
+
 	log.Info("Reusing exist JPG file name: ", jpgFilename, "as the output")
 
-	return srcImg, nil
+	return &base64url, &filePathData, nil
 }
 
-func (f *File) Base64toFile() (string, error) {
+func (f *File) Base64toFile(c *fiber.Ctx, includeDomain bool) (*string, *string, error) {
 	if len(f.FileData) == 0 || f.FileType != "PDF" {
-		return "", errors.New("Invalid file data or file type, expected PDF file type but got " + f.FileType)
+		return nil, nil, errors.New("Invalid file data or file type, expected PDF file type but got " + f.FileType)
 	}
 
 	// encode blob to string
@@ -148,28 +155,37 @@ func (f *File) Base64toFile() (string, error) {
 
 		data, err := base64.StdEncoding.DecodeString(fileData)
 		if err != nil {
-			return "", err
+			return nil, nil, err
 		}
 
 		err = os.WriteFile(fileName, data, 0644)
 		if err != nil {
-			return "", err
+			return nil, nil, err
 		}
 
 		srcFile := fmt.Sprintf("data:file/%s;base64,%s", strings.ToLower(f.FileType), base64.StdEncoding.EncodeToString(data))
+
 		log.Info("Reusing exist ", f.FileType, " file name: ", fileName, "as the output")
 
-		return srcFile, nil
+		filePathData := fileName
+		if includeDomain {
+			filePathData = fmt.Sprintf("%s/%s", c.Hostname(), fileName)
+		}
+		return &srcFile, &filePathData, nil
 	}
 
 	data, err := os.ReadFile(fileName)
 	if err != nil {
-		return "", err
+		return nil, nil, err
 	}
 
 	srcFile := fmt.Sprintf("data:file/%s;base64,%s", strings.ToLower(f.FileType), base64.StdEncoding.EncodeToString(data))
+	filePathData := fileName
+	if includeDomain {
+		filePathData = fmt.Sprintf("%s/%s", c.Hostname(), fileName)
+	}
 	log.Info("Reusing exist ", f.FileType, " file name: ", fileName, "as the output")
 
-	return srcFile, nil
+	return &srcFile, &filePathData, nil
 
 }
