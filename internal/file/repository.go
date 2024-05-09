@@ -7,6 +7,7 @@ import (
 )
 
 type FileRepository interface {
-	CreateFile(ctx context.Context, file *entities.FileUploaderReq) error
+	CreateFile(ctx context.Context, file *entities.FileUploaderReq) (*int64, error)
 	GetFiles(ctx context.Context) ([]*entities.File, error)
+	GetFileById(ctx context.Context, id *int64) (*entities.File, error)
 }
