@@ -51,7 +51,7 @@ func (h *fileConn) UploadFile(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	status, err := h.FileUse.OnUploadFile(ctx, req)
+	res, status, err := h.FileUse.OnUploadFile(c, ctx, req)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      http.StatusText(status),
@@ -62,12 +62,16 @@ func (h *fileConn) UploadFile(c *fiber.Ctx) error {
 		})
 	}
 
+	if res.FileType == "PDF" {
+		return c.SendFile(res.FilePathData)
+	}
 	return c.Status(status).JSON(fiber.Map{
 		"status":      http.StatusText(status),
 		"status_code": status,
 		"message":     "",
-		"result":      "",
+		"result":      res,
 	})
+
 }
 
 func (h *fileConn) GetSourceFiles(c *fiber.Ctx) error {
@@ -77,7 +81,7 @@ func (h *fileConn) GetSourceFiles(c *fiber.Ctx) error {
 
 	defer cancel()
 
-	files, status, err := h.FileUse.GetSourceFiles(ctx)
+	files, status, err := h.FileUse.GetSourceFiles(c, ctx)
 	if err != nil {
 		return c.Status(status).JSON(fiber.Map{
 			"status":      http.StatusText(status),

@@ -8,7 +8,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/textures1245/go-template/internal/file/repository"
 	"github.com/textures1245/go-template/internal/file/usecase"
-	"github.com/textures1245/go-template/pkg/middleware"
 )
 
 func UseFileRoute(db *sqlx.DB, app *fiber.App) {
@@ -23,6 +22,6 @@ func UseFileRoute(db *sqlx.DB, app *fiber.App) {
 	fileUse := usecase.NewFileUsecase(fileRepo)
 	fileConn := NewFileHandler(fileUse)
 
-	authR.Post("/upload", middleware.JwtAuthentication(), fileConn.UploadFile)
-	authR.Get("/get-files", middleware.JwtAuthentication(), fileConn.GetSourceFiles)
+	authR.Post("/upload", fileConn.UploadFile)
+	authR.Get("/get-files", fileConn.GetSourceFiles)
 }
