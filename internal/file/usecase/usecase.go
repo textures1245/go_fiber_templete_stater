@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"context"
-	"errors"
+
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -36,43 +36,15 @@ func (u *fileUsecase) OnUploadFile(c *fiber.Ctx, ctx context.Context, req *entit
 		return nil, status, cErr
 	}
 
-	var (
-		// base64urlRes string
-		fPathDatRes string
-	)
-	switch file.FileType {
-	case "PNG":
-		_, fPathDat, err := file.Base64toPng(c)
-		if err != nil {
-			status, cErr := apperror.CustomSqlExecuteHandler("File", err)
-			return nil, status, cErr
-		}
-		// base64urlRes = *base64url
-		fPathDatRes = *fPathDat
-	case "JPG":
-		_, fPathDat, err := file.Base64toJpg(c)
-		if err != nil {
-			status, cErr := apperror.CustomSqlExecuteHandler("File", err)
-			return nil, status, cErr
-		}
-		// base64urlRes = *base64url
-		fPathDatRes = *fPathDat
-	case "PDF":
-		_, fPathDat, err := file.Base64toFile(c, false)
-		if err != nil {
-			status, cErr := apperror.CustomSqlExecuteHandler("File", err)
-			return nil, status, cErr
-		}
-		// base64urlRes = *base64url
-		fPathDatRes = *fPathDat
-	default:
-		return nil, http.StatusBadRequest, apperror.NewCErr(errors.New("Only except for PNG and JPG for now"), errors.ErrUnsupported)
+	_, fPathDat, status, errOnDecode := file.DecodeBlobToFile(c, true)
+	if errOnDecode != nil {
+		return nil, status, errOnDecode
 	}
 
 	filesRes := &dtos.FileSourceDataRes{
 		FileName: file.FileName,
 		// FileBase64URL: base64urlRes,
-		FilePathData: fPathDatRes,
+		FilePathData: *fPathDat,
 		FileType:     file.FileType,
 		CreatedAt:    file.CreatedAt,
 		UpdatedAt:    file.UpdatedAt,
@@ -90,43 +62,15 @@ func (u *fileUsecase) GetSourceFiles(c *fiber.Ctx, ctx context.Context) ([]*dtos
 
 	filesRes := []*dtos.FileSourceDataRes{}
 	for _, file := range files {
-		var (
-			// base64urlRes string
-			fPathDatRes string
-		)
-		switch file.FileType {
-		case "PNG":
-			_, fPathDat, err := file.Base64toPng(c)
-			if err != nil {
-				status, cErr := apperror.CustomSqlExecuteHandler("File", err)
-				return nil, status, cErr
-			}
-			// base64urlRes = *base64url
-			fPathDatRes = *fPathDat
-		case "JPG":
-			_, fPathDat, err := file.Base64toJpg(c)
-			if err != nil {
-				status, cErr := apperror.CustomSqlExecuteHandler("File", err)
-				return nil, status, cErr
-			}
-			// base64urlRes = *base64url
-			fPathDatRes = *fPathDat
-		case "PDF":
-			_, fPathDat, err := file.Base64toFile(c, true)
-			if err != nil {
-				status, cErr := apperror.CustomSqlExecuteHandler("File", err)
-				return nil, status, cErr
-			}
-			// base64urlRes = *base64url
-			fPathDatRes = *fPathDat
-		default:
-			return nil, http.StatusBadRequest, apperror.NewCErr(errors.New("Only except for PNG and JPG for now"), errors.ErrUnsupported)
+		_, fPathDat, status, errOnDecode := file.DecodeBlobToFile(c, true)
+		if errOnDecode != nil {
+			return nil, status, errOnDecode
 		}
 
 		filesRes = append(filesRes, &dtos.FileSourceDataRes{
 			FileName: file.FileName,
 			// FileBase64URL: base64urlRes,
-			FilePathData: fPathDatRes,
+			FilePathData: *fPathDat,
 			FileType:     file.FileType,
 			CreatedAt:    file.CreatedAt,
 			UpdatedAt:    file.UpdatedAt,
