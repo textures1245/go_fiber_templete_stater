@@ -110,6 +110,23 @@ func (a *authConn) Register(c *fiber.Ctx) error {
 		})
 	}
 
+	// TODO: Created Recovery when failed to send email
+	email := &utils.Email{
+		From:    "comcamp.22nd@gmail.com",
+		To:      "sirprak1245@gmail.com",
+		Subject: "Register Successfully",
+		Body:    "Welcome to our platform",
+	}
+	if errOnSend := email.Send(); errOnSend != nil {
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"status":      http.StatusText(http.StatusInternalServerError),
+			"status_code": http.StatusInternalServerError,
+			"message":     "error, failed to send email",
+			"raw_message": errOnSend.Error(),
+			"result":      nil,
+		})
+	}
+
 	return c.Status(status).JSON(fiber.Map{
 		"status":      http.StatusText(status),
 		"status_code": status,
