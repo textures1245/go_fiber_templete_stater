@@ -29,6 +29,22 @@ func Init() {
 		panic(err)
 	}
 
+	// Create a new viper instance to read the .env file
+	viper2 := viper.New()
+	viper2.SetConfigName(".env")
+	viper2.SetConfigType("env")
+	viper2.AddConfigPath(".")
+
+	errOnReadCfg := viper2.ReadInConfig()
+	if errOnReadCfg != nil {
+		log.Fatalf("Error while reading config file %s", errOnReadCfg)
+	}
+
+	// Merge the .env file with the existing configuration
+	for _, key := range viper2.AllKeys() {
+		viper.Set(key, viper2.Get(key))
+	}
+
 	logLevel = viper.GetString("LOG_LEVEL")
 	println("log:" + logLevel)
 
