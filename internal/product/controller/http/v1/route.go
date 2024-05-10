@@ -9,7 +9,7 @@ import (
 	fileRepo "github.com/textures1245/go-template/internal/file/repository"
 	"github.com/textures1245/go-template/internal/product/repository"
 	"github.com/textures1245/go-template/internal/product/usecase"
-	"github.com/textures1245/go-template/pkg/middleware"
+	// "github.com/textures1245/go-template/pkg/middleware"
 )
 
 func UseProductRoute(db *sqlx.DB, app *fiber.App) {
@@ -25,6 +25,7 @@ func UseProductRoute(db *sqlx.DB, app *fiber.App) {
 	prodUse := usecase.NewProductUsecase(prodRepo, fileRepo)
 	prodConn := NewProductHandler(prodUse)
 
-	authR.Post("/add-products", middleware.JwtAuthentication(), prodConn.CreateProducts)
-	// authR.Get("/get-products", middleware.JwtAuthentication(), prodConn.GetSourceFiles)
+	authR.Post("/add-products", prodConn.CreateProducts)
+	authR.Get("/get-products", prodConn.GetProducts)
+	authR.Get("/export-to-excel", prodConn.ExportDataAsExcel)
 }
