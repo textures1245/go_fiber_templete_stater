@@ -6,6 +6,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/textures1245/go-template/internal/product"
+	"github.com/textures1245/go-template/internal/product/dtos"
 	"github.com/textures1245/go-template/internal/product/entities"
 	"github.com/textures1245/go-template/internal/product/repository/repository_query"
 	"github.com/textures1245/go-template/pkg/utils"
@@ -42,4 +43,15 @@ func (r *productRepo) CreateProduct(ctx context.Context, product *entities.Produ
 	}
 
 	return &createID, nil
+}
+
+func (r *productRepo) GetProducts(ctx context.Context) ([]*dtos.ProductDataRes, error) {
+	var products []*dtos.ProductDataRes
+
+	err := r.Db.SelectContext(ctx, &products, repository_query.GetProductsLeftJoinFile)
+	if err != nil {
+		return nil, err
+	}
+
+	return products, nil
 }
