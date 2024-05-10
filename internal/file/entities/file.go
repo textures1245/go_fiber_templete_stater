@@ -10,11 +10,13 @@ import (
 	"image"
 	"image/jpeg"
 	"image/png"
+	"net/http"
 	"os"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/textures1245/go-template/pkg/apperror"
 )
 
 type File struct {
@@ -25,6 +27,8 @@ type File struct {
 	CreatedAt string `db:"created_at"`
 	UpdatedAt string `db:"updated_at"`
 }
+
+// TODO: Refactor to reducing time to decode blob to file from checking exist file with goroutine
 
 func (f *File) Base64toPng(c *fiber.Ctx) (*string, *string, error) {
 
@@ -188,4 +192,41 @@ func (f *File) Base64toFile(c *fiber.Ctx, includeDomain bool) (*string, *string,
 
 	return &srcFile, &filePathData, nil
 
+}
+
+func (file *File) DecodeBlobToFile(c *fiber.Ctx, domainIncludeOnFile bool) (*string, *string, int, *apperror.CErr) {
+	var (
+		base64urlRes string
+		fPathDatRes  string
+	)
+	switch file.FileType {
+	case "PNG":
+		base64url, fPathDat, err := file.Base64toPng(c)
+		if err != nil {
+			status, cErr := apperror.CustomSqlExecuteHandler("File", err)
+			return nil, nil, status, cErr
+		}
+		base64urlRes = *base64url
+		fPathDatRes = *fPathDat
+	case "JPG":
+		base64url, fPathDat, err := file.Base64toJpg(c)
+		if err != nil {
+			status, cErr := apperror.CustomSqlExecuteHandler("File", err)
+			return nil, nil, status, cErr
+		}
+		base64urlRes = *base64url
+		fPathDatRes = *fPathDat
+	case "PDF":
+		base64url, fPathDat, err := file.Base64toFile(c, domainIncludeOnFile)
+		if err != nil {
+			status, cErr := apperror.CustomSqlExecuteHandler("File", err)
+			return nil, nil, status, cErr
+		}
+		base64urlRes = *base64url
+		fPathDatRes = *fPathDat
+	default:
+		return nil, nil, http.StatusBadRequest, apperror.NewCErr(errors.New("Only except for PNG and JPG for now"), errors.ErrUnsupported)
+	}
+
+	return &base64urlRes, &fPathDatRes, http.StatusOK, nil
 }
