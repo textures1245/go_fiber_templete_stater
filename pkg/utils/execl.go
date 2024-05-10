@@ -27,11 +27,25 @@ func (e Excel[T]) ExportData() (*struct {
 		return nil, apperror.NewCErr(errors.New("Failed to create new sheet"), err)
 	}
 
+	v := reflect.ValueOf(*e.Data[0])
+
+	// set first row as column name from key struct
+	for j := 0; j < v.NumField(); j++ {
+		val := v.Type().Field(j).Name
+
+		cellName := fmt.Sprintf("%c%d", 'A'+j, 1)
+		f.SetCellValue(fileName, cellName, val)
+	}
+
 	for i, dat := range e.Data {
 		// TODO: Refactor this to skip the pointer check if the value is a inside a struct not an pointer
-		v := reflect.ValueOf(dat).Elem()
 
-		// typeOfP := v.Type()
+		// increment i for skipped the first row
+		if i == 0 {
+			i++
+		}
+
+		v := reflect.ValueOf(dat).Elem()
 
 		// Loop over the fields of the product
 		for j := 0; j < v.NumField(); j++ {
