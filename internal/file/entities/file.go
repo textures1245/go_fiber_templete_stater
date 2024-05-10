@@ -28,8 +28,6 @@ type File struct {
 	UpdatedAt string `db:"updated_at"`
 }
 
-// TODO: Refactor to reducing time to decode blob to file from checking exist file with goroutine
-
 func (f *File) Base64toPng(c *fiber.Ctx) (*string, *string, error) {
 
 	if len(f.FileData) == 0 || f.FileType != "PNG" {
@@ -41,7 +39,8 @@ func (f *File) Base64toPng(c *fiber.Ctx) (*string, *string, error) {
 	hasher.Write([]byte(fileData))
 	hash := hex.EncodeToString(hasher.Sum(nil))
 
-	pngFilename := "public/image/" + hash + ".png"
+	path := "public/image/"
+	pngFilename := path + hash + ".png"
 
 	if _, err := os.Stat(pngFilename); os.IsNotExist(err) {
 		reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(fileData))
@@ -230,3 +229,67 @@ func (file *File) DecodeBlobToFile(c *fiber.Ctx, domainIncludeOnFile bool) (*str
 
 	return &base64urlRes, &fPathDatRes, http.StatusOK, nil
 }
+
+// func working() {
+// 	files, err := os.ReadDir(path)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+
+// 	// Determine the number of goroutines to use
+// 	numGoroutines := 2
+
+// 	// Calculate the size of each group
+// 	groupSize := (len(files) + numGoroutines - 1) / numGoroutines
+
+// 	var wg sync.WaitGroup
+
+// 	// Start a goroutine for each group
+// 	for i := 0; i < len(files); i += groupSize {
+// 		end := i + groupSize
+// 		if end > len(files) {
+// 			end = len(files)
+// 		}
+
+// 		wg.Add(1)
+// 		go func(files []os.DirEntry) {
+// 			defer wg.Done()
+// 			doJob := func(f []os.DirEntry) (*string, *string, error) {
+// 				for _, file := range f {
+// 					_, err := os.Stat(file.Name())
+// 					if os.IsNotExist(err) {
+// 						reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(fileData))
+// 						m, _, err := image.Decode(reader)
+// 						if err != nil {
+// 							return nil, nil, err
+// 						}
+// 						// bounds := m.Bounds()
+// 						// fmt.Println(bounds, formatString)
+
+// 						osFile, errOnOpenFIle := os.OpenFile(pngFilename, os.O_WRONLY|os.O_CREATE, 0777)
+// 						if errOnOpenFIle != nil {
+// 							return nil, nil, err
+// 						}
+// 						err = png.Encode(osFile, m)
+// 						if err != nil {
+// 							return nil, nil, err
+// 						}
+// 						buffer := new(bytes.Buffer)
+// 						errWhileEncoding := png.Encode(buffer, m) // img is your image.Image
+// 						if errWhileEncoding != nil {
+// 							return nil, nil, err
+// 						}
+// 						base64url := fmt.Sprintf("data:image/png;base64,%s", base64.StdEncoding.EncodeToString(buffer.Bytes()))
+// 						filePathData := fmt.Sprintf("%s/%s", c.Hostname(), pngFilename)
+// 						log.Info("Create new PNG file name: ", pngFilename, "as the output")
+
+// 						return &base64url, &filePathData, nil
+// 					}
+// 				}
+// 				return nil, nil, nil
+// 			}
+// 			base64url, filePathData, err := doJob(files)
+// 		}(files[i:end])
+// 	}
+// 	wg.Wait()
+// }
