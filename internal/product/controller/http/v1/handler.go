@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -87,5 +88,57 @@ func (h *prodConn) CreateProducts(c *fiber.Ctx) error {
 		"message":     "",
 		"result":      "",
 	})
+
+}
+
+func (h *prodConn) GetProducts(c *fiber.Ctx) error {
+	var (
+		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
+	)
+
+	defer cancel()
+
+	products, status, err := h.prodUse.OnGetProducts(c, ctx)
+	if err != nil {
+		return c.Status(status).JSON(fiber.Map{
+			"status":      http.StatusText(status),
+			"status_code": status,
+			"message":     err.CError.Error(),
+			"raw_message": err.RawError.Error(),
+			"result":      nil,
+		})
+	}
+
+	return c.Status(http.StatusOK).JSON(fiber.Map{
+		"status":      http.StatusText(http.StatusOK),
+		"status_code": http.StatusOK,
+		"message":     "",
+		"result":      products,
+	})
+}
+
+func (h *prodConn) ExportDataAsExcel(c *fiber.Ctx) error {
+	var (
+		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
+	)
+
+	defer cancel()
+
+	res, status, err := h.prodUse.ExportDataAsExcel(c, ctx)
+	if err != nil {
+		return c.Status(status).JSON(fiber.Map{
+			"status":      http.StatusText(status),
+			"status_code": status,
+			"message":     err.CError.Error(),
+			"raw_message": err.RawError.Error(),
+			"result":      nil,
+		})
+	}
+
+	// Set the headers to force file download
+	c.Set("Content-Type", "application/octet-stream")
+	c.Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", res.FileName))
+
+	return c.Send(res.FileBuffer.Bytes())
 
 }
