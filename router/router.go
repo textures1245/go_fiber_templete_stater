@@ -6,6 +6,7 @@ import (
 
 	"github.com/textures1245/go-template/controller"
 	"github.com/textures1245/go-template/handler"
+	modelHandler "github.com/textures1245/go-template/model/handler"
 	"github.com/textures1245/go-template/repository"
 	"github.com/textures1245/go-template/service"
 
@@ -51,6 +52,7 @@ func SetupRoutes(app *fiber.App) {
 	})
 	api.Get("/api/something", controller.SampleControllerFunction)
 	api.Get("/api/ping", controller.Ping)
+	api.Get("/api/send-to-external-api", modelHandler.GetUserList)
 
 	userV1.UseUserRoute(db, app)
 	authV1.UseAuthRoute(db, app)

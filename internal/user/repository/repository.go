@@ -159,5 +159,3 @@ func (r *userRepo) DeleteUserById(ctx context.Context, userID int64) error {
 
 	return nil
 }
-
-// TODO: Checking row affect for the update and delete

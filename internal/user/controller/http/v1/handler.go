@@ -121,7 +121,6 @@ func (con *userCon) FetchUsers(c *fiber.Ctx) error {
 	})
 }
 
-// TODO: continue the implementation of the FetchUserById function when finishing auth model
 func (con *userCon) FetchUserById(c *fiber.Ctx) error {
 	var (
 		ctx, cancel = context.WithTimeout(c.Context(), time.Duration(30*time.Second))
